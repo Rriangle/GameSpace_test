@@ -1,0 +1,285 @@
+@{
+    ViewData["Title"] = "寵物系統管理";
+    Layout = "~/Areas/MiniGame/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- 頁面標題 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-paw mr-2 text-primary"></i>寵物系統管理
+        </h1>
+        <div class="d-flex">
+            <a href="@Url.Action("SystemRules")" class="btn btn-primary mr-2 shadow-sm">
+                <i class="fas fa-cog"></i> 系統規則設定
+            </a>
+            <a href="@Url.Action("IndividualSettings")" class="btn btn-success shadow-sm">
+                <i class="fas fa-user-edit"></i> 個別寵物設定
+            </a>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">總寵物數量</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalPets">載入中...</div>
+                            <div class="text-xs text-muted">較昨日 <span class="text-success">+5.2%</span></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-paw fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">活躍寵物</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="activePets">載入中...</div>
+                            <div class="text-xs text-muted">較昨日 <span class="text-success">+12</span></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-heart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2 hover-card">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">平均等級</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgLevel">載入中...</div>
+                    <div class="text-xs text-muted">較昨日 <span class="text-info">+0.3</span></div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-star fa-2x text-gray-300"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">今日互動</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="todayInteractions">載入中...</div>
+                            <div class="text-xs text-muted">較昨日 <span class="text-warning">+23</span></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hand-paper fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-bolt"></i> 快速操作
+                    </h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">操作選項</div>
+                            <a class="dropdown-item" href="@Url.Action("QueryPets")">
+                                <i class="fas fa-search fa-sm fa-fw mr-2 text-gray-400"></i>
+                                查詢寵物清單
+                            </a>
+                            <a class="dropdown-item" href="@Url.Action("ColorChangeHistory")">
+                                <i class="fas fa-palette fa-sm fa-fw mr-2 text-gray-400"></i>
+                                換膚色記錄
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="@Url.Action("SystemRules")" class="btn btn-outline-primary btn-block btn-hover">
+                                <i class="fas fa-cog"></i> 系統規則設定
+                                <small class="d-block text-muted">設定升級規則與互動增益</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="@Url.Action("IndividualSettings")" class="btn btn-outline-success btn-block btn-hover">
+                                <i class="fas fa-user-edit"></i> 個別寵物設定
+                                <small class="d-block text-muted">調整特定寵物資料</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="@Url.Action("QueryPets")" class="btn btn-outline-info btn-block btn-hover">
+                                <i class="fas fa-search"></i> 查詢寵物清單
+                                <small class="d-block text-muted">查看所有寵物資料</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="@Url.Action("ColorChangeHistory")" class="btn btn-outline-warning btn-block btn-hover">
+                                <i class="fas fa-palette"></i> 換膚色記錄
+                                <small class="d-block text-muted">查看換膚色歷史</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近活動 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-clock"></i> 最近活動
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="recentActivityTable">
+                            <thead>
+                                <tr>
+                                    <th>時間</th>
+                                    <th>會員</th>
+                                    <th>寵物名稱</th>
+                                    <th>操作類型</th>
+                                    <th>狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2024-01-15 14:30</td>
+                                    <td>user001</td>
+                                    <td>小可愛</td>
+                                    <td><span class="badge badge-primary">升級</span></td>
+                                    <td><span class="badge badge-success">成功</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-15 14:25</td>
+                                    <td>user002</td>
+                                    <td>史萊姆</td>
+                                    <td><span class="badge badge-info">換膚色</span></td>
+                                    <td><span class="badge badge-success">成功</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-15 14:20</td>
+                                    <td>user003</td>
+                                    <td>小寶貝</td>
+                                    <td><span class="badge badge-warning">互動</span></td>
+                                    <td><span class="badge badge-success">成功</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .btn-hover {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-hover::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-hover:hover::before {
+        left: 100%;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #f8f9fc 0%, #e3e6f0 100%);
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    .table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.75em;
+        padding: 0.5em 0.8em;
+    }
+
+    .text-xs {
+        font-size: 0.7rem;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // 模擬載入數據
+        setTimeout(function() {
+            $("#totalPets").text("1,234");
+            $("#activePets").text("89");
+            $("#avgLevel").text("15.6");
+            $("#todayInteractions").text("234");
+        }, 1000);
+
+        // 初始化 DataTable
+        $("#recentActivityTable").DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+            },
+            "pageLength": 10,
+            "order": [[0, "desc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": 4 }
+            ]
+        });
+
+        // 添加載入動畫
+        $(".card").each(function(index) {
+            $(this).css("animation-delay", (index * 0.1) + "s");
+            $(this).addClass("fade-in");
+        });
+    });
+</script>

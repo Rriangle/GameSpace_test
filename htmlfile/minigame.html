@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小遊戲系統 - GameSpace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #7557ff;
+            --secondary-color: #34d2ff;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-light: linear-gradient(135deg, #eef3f8 0%, #ffffff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            background: var(--bg-light);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            line-height: 1.65;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(17, 24, 39, 0.12);
+            transition: all 0.16s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 24px 48px rgba(17, 24, 39, 0.18);
+        }
+
+        .navbar {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .game-level-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .game-level-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(117, 87, 255, 0.15);
+        }
+
+        .game-level-card.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(117, 87, 255, 0.1), rgba(52, 210, 255, 0.1));
+        }
+
+        .game-level-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .start-game-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .start-game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(117, 87, 255, 0.3);
+        }
+
+        .start-game-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .game-session {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .session-id {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .session-time {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .pet-status {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .pet-attribute {
+            text-align: center;
+            padding: 15px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            margin: 5px;
+        }
+
+        .pet-attribute-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .game-screen {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-character {
+            font-size: 8rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .game-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .game-btn.attack {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+        }
+
+        .game-btn.defend {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .game-btn.special {
+            background: linear-gradient(135deg, var(--warning-color), #f97316);
+            color: white;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content {
+            min-height: 400px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 8px 20px rgba(17, 24, 39, 0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .game-record {
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 10px 0;
+            background: var(--glass-bg);
+            border-radius: 8px;
+        }
+
+        .game-record.win {
+            border-left-color: var(--success-color);
+        }
+
+        .game-record.lose {
+            border-left-color: var(--danger-color);
+        }
+
+        .game-record.abort {
+            border-left-color: var(--warning-color);
+        }
+
+        .level-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-gamepad me-2" style="color: var(--primary-color);"></i>
+                GameSpace
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pet.html">寵物系統</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="minigame.html">小遊戲</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="wallet.html">會員錢包</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="signin.html">每日簽到</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="container" style="margin-top: 100px;">
+        <!-- 遊戲會話顯示 -->
+        <div class="row mb-5" id="gameSession" style="display: none;">
+            <div class="col-12">
+                <div class="game-session">
+                    <div class="session-id">遊戲會話ID: <span id="sessionId">GS20240115001</span></div>
+                    <div class="session-time">開始時間: <span id="startTime">2024-01-15 14:30:00</span></div>
+                    <div class="session-time">預估結束時間: <span id="endTime">2024-01-15 14:35:00</span></div>
+                    <div class="session-time">當日剩餘可玩次數: <span id="remainingPlays">3</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 標籤導航 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <ul class="nav nav-pills nav-fill" id="gameTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="adventure-tab" data-bs-toggle="pill" data-bs-target="#adventure" type="button" role="tab">
+                            <i class="fas fa-play me-2"></i>出發冒險
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="records-tab" data-bs-toggle="pill" data-bs-target="#records" type="button" role="tab">
+                            <i class="fas fa-history me-2"></i>遊戲紀錄
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 標籤內容 -->
+        <div class="tab-content" id="gameTabContent">
+            <!-- 出發冒險 -->
+            <div class="tab-pane fade show active" id="adventure" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-play me-2" style="color: var(--primary-color);"></i>
+                                選擇難度等級
+                            </h4>
+                            <div class="game-level-card selected" data-level="easy">
+                                <h5 class="fw-bold">簡單模式</h5>
+                                <p class="text-muted">適合新手玩家</p>
+                                <div class="mt-3">
+                                    <div class="fw-bold text-success">獎勵: 50點數</div>
+                                    <div class="small text-muted">寵物經驗: +20</div>
+                                </div>
+                            </div>
+                            <div class="game-level-card" data-level="normal">
+                                <h5 class="fw-bold">普通模式</h5>
+                                <p class="text-muted">平衡的挑戰</p>
+                                <div class="mt-3">
+                                    <div class="fw-bold text-warning">獎勵: 100點數</div>
+                                    <div class="small text-muted">寵物經驗: +40</div>
+                                </div>
+                            </div>
+                            <div class="game-level-card" data-level="hard">
+                                <h5 class="fw-bold">困難模式</h5>
+                                <p class="text-muted">高難度挑戰</p>
+                                <div class="mt-3">
+                                    <div class="fw-bold text-danger">獎勵: 200點數</div>
+                                    <div class="small text-muted">寵物經驗: +80</div>
+                                </div>
+                            </div>
+                            <div class="game-level-card locked" data-level="expert">
+                                <h5 class="fw-bold">專家模式</h5>
+                                <p class="text-muted">需要等級15解鎖</p>
+                                <div class="mt-3">
+                                    <div class="fw-bold text-danger">獎勵: 500點數</div>
+                                    <div class="small text-muted">寵物經驗: +200</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-heart me-2" style="color: #ff6b6b;"></i>
+                                寵物狀態檢查
+                            </h4>
+                            <div class="pet-status">
+                                <div class="pet-attribute">
+                                    <div class="pet-attribute-icon">🍎</div>
+                                    <div class="fw-bold">飢餓值</div>
+                                    <div class="small text-muted">75/100</div>
+                                </div>
+                                <div class="pet-attribute">
+                                    <div class="pet-attribute-icon">😊</div>
+                                    <div class="fw-bold">心情值</div>
+                                    <div class="small text-muted">60/100</div>
+                                </div>
+                                <div class="pet-attribute">
+                                    <div class="pet-attribute-icon">⚡</div>
+                                    <div class="fw-bold">體力值</div>
+                                    <div class="small text-muted">85/100</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    寵物狀態良好，可以開始冒險！
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-gamepad me-2" style="color: var(--secondary-color);"></i>
+                                遊戲控制
+                            </h4>
+                            <div class="text-center">
+                                <button class="start-game-btn w-100 mb-3" onclick="startAdventure()">
+                                    <i class="fas fa-rocket me-2"></i>開始冒險
+                                </button>
+                                <div class="small text-muted">
+                                    每日可玩次數: 5次
+                                </div>
+                                <div class="small text-muted">
+                                    今日已玩: 2次
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 遊戲紀錄 -->
+            <div class="tab-pane fade" id="records" role="tabpanel">
+                <div class="glass-card p-4">
+                    <h4 class="fw-bold mb-4">
+                        <i class="fas fa-history me-2" style="color: var(--primary-color);"></i>
+                        遊戲紀錄
+                    </h4>
+                    <div class="mb-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="fw-bold text-success">8</div>
+                                <div class="small text-muted">勝利場次</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-bold text-danger">3</div>
+                                <div class="small text-muted">失敗場次</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-bold text-primary">1,200</div>
+                                <div class="small text-muted">總獲得點數</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record win">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-15 14:30 - 14:35</h6>
+                                <p class="text-muted mb-0">簡單模式 - 勝利</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+50點數</div>
+                                <div class="small text-muted">+20寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record win">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-15 13:15 - 13:25</h6>
+                                <p class="text-muted mb-0">普通模式 - 勝利</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+100點數</div>
+                                <div class="small text-muted">+40寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record lose">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-15 12:00 - 12:10</h6>
+                                <p class="text-muted mb-0">困難模式 - 失敗</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-danger">+0點數</div>
+                                <div class="small text-muted">+10寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record win">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-14 16:45 - 16:55</h6>
+                                <p class="text-muted mb-0">普通模式 - 勝利</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+100點數</div>
+                                <div class="small text-muted">+40寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record win">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-14 15:30 - 15:40</h6>
+                                <p class="text-muted mb-0">簡單模式 - 勝利</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+50點數</div>
+                                <div class="small text-muted">+20寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record lose">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-14 14:15 - 14:25</h6>
+                                <p class="text-muted mb-0">困難模式 - 失敗</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-danger">+0點數</div>
+                                <div class="small text-muted">+10寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record win">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-13 17:00 - 17:10</h6>
+                                <p class="text-muted mb-0">普通模式 - 勝利</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+100點數</div>
+                                <div class="small text-muted">+40寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-record win">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">2024-01-13 16:00 - 16:10</h6>
+                                <p class="text-muted mb-0">簡單模式 - 勝利</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">+50點數</div>
+                                <div class="small text-muted">+20寵物經驗</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 遊戲畫面模態框 -->
+    <div class="modal fade" id="gameModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">冒險進行中</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="game-screen">
+                        <div class="game-character">🐉</div>
+                        <h4 class="fw-bold mb-3">遇到了一隻龍！</h4>
+                        <p class="text-muted mb-4">選擇你的行動</p>
+                        <div class="game-controls">
+                            <button class="game-btn attack" onclick="gameAction('attack')">
+                                <i class="fas fa-sword me-2"></i>攻擊
+                            </button>
+                            <button class="game-btn defend" onclick="gameAction('defend')">
+                                <i class="fas fa-shield me-2"></i>防禦
+                            </button>
+                            <button class="game-btn special" onclick="gameAction('special')">
+                                <i class="fas fa-magic me-2"></i>特殊技能
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知 -->
+    <div class="notification" id="notification">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-2 text-success"></i>
+            <span id="notificationText">遊戲開始！</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 遊戲數據
+        let gameData = {
+            currentLevel: 'easy',
+            dailyPlays: 5,
+            usedPlays: 2,
+            currentSession: null,
+            records: [
+                { startTime: '2024-01-15 14:30', endTime: '2024-01-15 14:35', result: 'win', points: 50, experience: 20, level: 'easy' },
+                { startTime: '2024-01-15 13:15', endTime: '2024-01-15 13:25', result: 'win', points: 100, experience: 40, level: 'normal' },
+                { startTime: '2024-01-15 12:00', endTime: '2024-01-15 12:10', result: 'lose', points: 0, experience: 10, level: 'hard' },
+                { startTime: '2024-01-14 16:45', endTime: '2024-01-14 16:55', result: 'win', points: 100, experience: 40, level: 'normal' },
+                { startTime: '2024-01-14 15:30', endTime: '2024-01-14 15:40', result: 'win', points: 50, experience: 20, level: 'easy' },
+                { startTime: '2024-01-14 14:15', endTime: '2024-01-14 14:25', result: 'lose', points: 0, experience: 10, level: 'hard' },
+                { startTime: '2024-01-13 17:00', endTime: '2024-01-13 17:10', result: 'win', points: 100, experience: 40, level: 'normal' },
+                { startTime: '2024-01-13 16:00', endTime: '2024-01-13 16:10', result: 'win', points: 50, experience: 20, level: 'easy' }
+            ]
+        };
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGameRecords();
+            setupLevelSelection();
+        });
+
+        // 設置難度選擇
+        function setupLevelSelection() {
+            const levelCards = document.querySelectorAll('.game-level-card');
+            levelCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    if (this.classList.contains('locked')) {
+                        showNotification('需要達到更高等級才能解鎖此難度！', 'error');
+                        return;
+                    }
+                    
+                    document.querySelectorAll('.game-level-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    gameData.currentLevel = this.dataset.level;
+                });
+            });
+        }
+
+        // 開始冒險
+        function startAdventure() {
+            if (gameData.usedPlays >= gameData.dailyPlays) {
+                showNotification('今日遊戲次數已用完！', 'error');
+                return;
+            }
+
+            // 生成會話ID
+            const sessionId = 'GS' + new Date().getTime();
+            const startTime = new Date();
+            const endTime = new Date(startTime.getTime() + 5 * 60 * 1000); // 5分鐘後
+
+            gameData.currentSession = {
+                id: sessionId,
+                startTime: startTime,
+                endTime: endTime,
+                level: gameData.currentLevel
+            };
+
+            // 更新會話顯示
+            updateSessionDisplay();
+            
+            // 顯示遊戲模態框
+            const gameModal = new bootstrap.Modal(document.getElementById('gameModal'));
+            gameModal.show();
+
+            showNotification('冒險開始！祝你好運！');
+        }
+
+        // 更新會話顯示
+        function updateSessionDisplay() {
+            if (gameData.currentSession) {
+                document.getElementById('sessionId').textContent = gameData.currentSession.id;
+                document.getElementById('startTime').textContent = gameData.currentSession.startTime.toLocaleString('zh-TW');
+                document.getElementById('endTime').textContent = gameData.currentSession.endTime.toLocaleString('zh-TW');
+                document.getElementById('remainingPlays').textContent = gameData.dailyPlays - gameData.usedPlays;
+                document.getElementById('gameSession').style.display = 'block';
+            }
+        }
+
+        // 遊戲行動
+        function gameAction(action) {
+            if (!gameData.currentSession) return;
+
+            // 模擬遊戲結果
+            const winChance = {
+                'easy': 0.8,
+                'normal': 0.6,
+                'hard': 0.3
+            };
+
+            const isWin = Math.random() < winChance[gameData.currentLevel];
+            const endTime = new Date();
+
+            // 計算獎勵
+            const rewards = {
+                'easy': { points: 50, experience: 20 },
+                'normal': { points: 100, experience: 40 },
+                'hard': { points: 200, experience: 80 }
+            };
+
+            const reward = rewards[gameData.currentLevel];
+            const points = isWin ? reward.points : 0;
+            const experience = isWin ? reward.experience : Math.floor(reward.experience / 2);
+
+            // 記錄遊戲結果
+            const record = {
+                startTime: gameData.currentSession.startTime.toLocaleString('zh-TW'),
+                endTime: endTime.toLocaleString('zh-TW'),
+                result: isWin ? 'win' : 'lose',
+                points: points,
+                experience: experience,
+                level: gameData.currentLevel
+            };
+
+            gameData.records.unshift(record);
+            gameData.usedPlays++;
+
+            // 關閉模態框
+            const gameModal = bootstrap.Modal.getInstance(document.getElementById('gameModal'));
+            gameModal.hide();
+
+            // 顯示結果
+            const resultMessage = isWin ? 
+                勝利！獲得  點數和  寵物經驗！ : 
+                失敗！獲得  點數和  寵物經驗！;
+            
+            showNotification(resultMessage, isWin ? 'success' : 'warning');
+
+            // 更新顯示
+            updateSessionDisplay();
+            loadGameRecords();
+
+            // 清除當前會話
+            gameData.currentSession = null;
+        }
+
+        // 載入遊戲紀錄
+        function loadGameRecords() {
+            // 這裡可以從後端載入遊戲紀錄
+            // 目前使用靜態數據
+        }
+
+        // 顯示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notificationText');
+            const icon = notification.querySelector('i');
+            
+            text.textContent = message;
+            
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle me-2 text-danger';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle me-2 text-warning';
+            } else {
+                icon.className = 'fas fa-check-circle me-2 text-success';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

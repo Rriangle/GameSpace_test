@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寵物系統 - GameSpace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #7557ff;
+            --secondary-color: #34d2ff;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-light: linear-gradient(135deg, #eef3f8 0%, #ffffff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            background: var(--bg-light);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            line-height: 1.65;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(17, 24, 39, 0.12);
+            transition: all 0.16s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 24px 48px rgba(17, 24, 39, 0.18);
+        }
+
+        .navbar {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .pet-display {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pet-display:hover {
+            transform: scale(1.1);
+        }
+
+        .pet-display::before {
+            content: '😊';
+            animation: bounce 2s infinite, blink 4s infinite;
+        }
+
+        .pet-display.hungry::before { content: '😋'; }
+        .pet-display.happy::before { content: '😄'; }
+        .pet-display.tired::before { content: '😴'; }
+        .pet-display.dirty::before { content: '��'; }
+        .pet-display.sick::before { content: '🤒'; }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-8px); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.3; }
+        }
+
+        .attribute-bar {
+            height: 20px;
+            border-radius: 10px;
+            background: #e5e7eb;
+            overflow: hidden;
+            position: relative;
+            margin: 8px 0;
+        }
+
+        .attribute-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .attribute-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .hunger { background: linear-gradient(90deg, #ef4444, #f59e0b); }
+        .mood { background: linear-gradient(90deg, #f59e0b, #22c55e); }
+        .stamina { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+        .cleanliness { background: linear-gradient(90deg, #06b6d4, #3b82f6); }
+        .health { background: linear-gradient(90deg, #ef4444, #22c55e); }
+
+        .interaction-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.16s ease;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .interaction-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .feed-btn { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; }
+        .play-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .sleep-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .clean-btn { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.2);
+        }
+
+        .color-option.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(117, 87, 255, 0.3);
+        }
+
+        .background-option {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .background-option:hover {
+            transform: scale(1.1);
+        }
+
+        .background-option.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(117, 87, 255, 0.3);
+        }
+
+        .level-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(117, 87, 255, 0.3);
+        }
+
+        .experience-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .experience-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 8px 20px rgba(17, 24, 39, 0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .tab-content {
+            min-height: 400px;
+        }
+
+        .attribute-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            margin: 10px 0;
+        }
+
+        .attribute-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .points-cost {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+
+        .free-label {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-gamepad me-2" style="color: var(--primary-color);"></i>
+                GameSpace
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="pet.html">寵物系統</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="minigame.html">小遊戲</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="wallet.html">會員錢包</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="signin.html">每日簽到</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="container" style="margin-top: 100px;">
+        <!-- 寵物顯示區域 -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="glass-card p-5 text-center">
+                    <div class="pet-display" id="petDisplay" style="background: linear-gradient(135deg, #ADD8E6, #87CEEB);">
+                        <div class="level-badge" id="levelBadge">Lv.12</div>
+                    </div>
+                    <h2 class="fw-bold mb-3" id="petName">小可愛</h2>
+                    <div class="experience-bar">
+                        <div class="experience-fill" id="experienceBar" style="width: 65%;"></div>
+                    </div>
+                    <p class="text-muted">經驗值: <span id="currentExp">1,250</span> / <span id="maxExp">1,920</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 標籤導航 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <ul class="nav nav-pills nav-fill" id="petTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="interaction-tab" data-bs-toggle="pill" data-bs-target="#interaction" type="button" role="tab">
+                            <i class="fas fa-heart me-2"></i>寵物互動
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="status-tab" data-bs-toggle="pill" data-bs-target="#status" type="button" role="tab">
+                            <i class="fas fa-chart-line me-2"></i>狀態查看
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="customize-tab" data-bs-toggle="pill" data-bs-target="#customize" type="button" role="tab">
+                            <i class="fas fa-palette me-2"></i>外觀設定
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab">
+                            <i class="fas fa-history me-2"></i>互動歷史
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 標籤內容 -->
+        <div class="tab-content" id="petTabContent">
+            <!-- 寵物互動 -->
+            <div class="tab-pane fade show active" id="interaction" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-heart me-2" style="color: #ff6b6b;"></i>
+                                與寵物互動
+                            </h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <button class="interaction-btn feed-btn w-100" onclick="interactWithPet('feed')">
+                                        <i class="fas fa-apple-alt me-2"></i>餵食
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <button class="interaction-btn play-btn w-100" onclick="interactWithPet('play')">
+                                        <i class="fas fa-gamepad me-2"></i>玩耍
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <button class="interaction-btn sleep-btn w-100" onclick="interactWithPet('sleep')">
+                                        <i class="fas fa-bed me-2"></i>哄睡
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <button class="interaction-btn clean-btn w-100" onclick="interactWithPet('clean')">
+                                        <i class="fas fa-shower me-2"></i>洗澡
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h6 class="fw-bold">互動效果說明：</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-apple-alt me-2" style="color: #f59e0b;"></i>餵食：飢餓值 +10，心情值 +5</li>
+                                    <li><i class="fas fa-gamepad me-2" style="color: #22c55e;"></i>玩耍：心情值 +15，體力值 -5</li>
+                                    <li><i class="fas fa-bed me-2" style="color: #3b82f6;"></i>哄睡：體力值 +20，心情值 +5</li>
+                                    <li><i class="fas fa-shower me-2" style="color: #06b6d4;"></i>洗澡：清潔值 +20，心情值 +10</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h5 class="fw-bold mb-3">快速狀態</h5>
+                            <div class="attribute-card">
+                                <div class="attribute-icon">🍎</div>
+                                <div class="fw-bold">飢餓值</div>
+                                <div class="attribute-bar">
+                                    <div class="attribute-fill hunger" id="hungerBar" style="width: 75%;"></div>
+                                </div>
+                                <div class="small text-muted" id="hungerValue">75/100</div>
+                            </div>
+                            <div class="attribute-card">
+                                <div class="attribute-icon">😊</div>
+                                <div class="fw-bold">心情值</div>
+                                <div class="attribute-bar">
+                                    <div class="attribute-fill mood" id="moodBar" style="width: 60%;"></div>
+                                </div>
+                                <div class="small text-muted" id="moodValue">60/100</div>
+                            </div>
+                            <div class="attribute-card">
+                                <div class="attribute-icon">⚡</div>
+                                <div class="fw-bold">體力值</div>
+                                <div class="attribute-bar">
+                                    <div class="attribute-fill stamina" id="staminaBar" style="width: 85%;"></div>
+                                </div>
+                                <div class="small text-muted" id="staminaValue">85/100</div>
+                            </div>
+                            <div class="attribute-card">
+                                <div class="attribute-icon">🧼</div>
+                                <div class="fw-bold">清潔值</div>
+                                <div class="attribute-bar">
+                                    <div class="attribute-fill cleanliness" id="cleanlinessBar" style="width: 90%;"></div>
+                                </div>
+                                <div class="small text-muted" id="cleanlinessValue">90/100</div>
+                            </div>
+                            <div class="attribute-card">
+                                <div class="attribute-icon">❤️</div>
+                                <div class="fw-bold">健康值</div>
+                                <div class="attribute-bar">
+                                    <div class="attribute-fill health" id="healthBar" style="width: 95%;"></div>
+                                </div>
+                                <div class="small text-muted" id="healthValue">95/100</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 狀態查看 -->
+            <div class="tab-pane fade" id="status" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-chart-line me-2" style="color: var(--primary-color);"></i>
+                                詳細狀態
+                            </h4>
+                            <div class="mb-4">
+                                <h6 class="fw-bold">基本資訊</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="text-muted">寵物名稱</div>
+                                        <div class="fw-bold" id="statusPetName">小可愛</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-muted">當前等級</div>
+                                        <div class="fw-bold" id="statusLevel">Lv.12</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h6 class="fw-bold">五維屬性</h6>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>🍎 飢餓值</span>
+                                        <span id="statusHunger">75/100</span>
+                                    </div>
+                                    <div class="attribute-bar">
+                                        <div class="attribute-fill hunger" style="width: 75%;"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>😊 心情值</span>
+                                        <span id="statusMood">60/100</span>
+                                    </div>
+                                    <div class="attribute-bar">
+                                        <div class="attribute-fill mood" style="width: 60%;"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>⚡ 體力值</span>
+                                        <span id="statusStamina">85/100</span>
+                                    </div>
+                                    <div class="attribute-bar">
+                                        <div class="attribute-fill stamina" style="width: 85%;"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>🧼 清潔值</span>
+                                        <span id="statusCleanliness">90/100</span>
+                                    </div>
+                                    <div class="attribute-bar">
+                                        <div class="attribute-fill cleanliness" style="width: 90%;"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>❤️ 健康值</span>
+                                        <span id="statusHealth">95/100</span>
+                                    </div>
+                                    <div class="attribute-bar">
+                                        <div class="attribute-fill health" style="width: 95%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-trophy me-2" style="color: #f59e0b;"></i>
+                                成就與統計
+                            </h4>
+                            <div class="mb-4">
+                                <h6 class="fw-bold">今日統計</h6>
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="fw-bold text-primary">12</div>
+                                        <div class="small text-muted">互動次數</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="fw-bold text-success">+150</div>
+                                        <div class="small text-muted">獲得經驗</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="fw-bold text-warning">+25</div>
+                                        <div class="small text-muted">獲得點數</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <h6 class="fw-bold">成就徽章</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-primary">🏆 新手飼主</span>
+                                    <span class="badge bg-success">💪 活力滿滿</span>
+                                    <span class="badge bg-warning">🎯 互動達人</span>
+                                    <span class="badge bg-info">🌟 升級專家</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold">下次升級</h6>
+                                <div class="text-muted small">
+                                    還需要 <span class="fw-bold text-primary">670</span> 點經驗值
+                                </div>
+                                <div class="text-muted small">
+                                    預計還需 <span class="fw-bold text-primary">3-5</span> 次互動
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 外觀設定 -->
+            <div class="tab-pane fade" id="customize" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-palette me-2" style="color: var(--primary-color);"></i>
+                                膚色設定
+                            </h4>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>當前膚色</span>
+                                    <span class="points-cost">需要 2,000 點數</span>
+                                </div>
+                            </div>
+                            <div class="color-picker">
+                                <div class="color-option selected" style="background: #ADD8E6;" data-color="#ADD8E6"></div>
+                                <div class="color-option" style="background: #FFB6C1;" data-color="#FFB6C1"></div>
+                                <div class="color-option" style="background: #98FB98;" data-color="#98FB98"></div>
+                                <div class="color-option" style="background: #F0E68C;" data-color="#F0E68C"></div>
+                                <div class="color-option" style="background: #DDA0DD;" data-color="#DDA0DD"></div>
+                                <div class="color-option" style="background: #FFA07A;" data-color="#FFA07A"></div>
+                                <div class="color-option" style="background: #87CEEB;" data-color="#87CEEB"></div>
+                                <div class="color-option" style="background: #F5DEB3;" data-color="#F5DEB3"></div>
+                            </div>
+                            <button class="btn btn-primary w-100 mt-3" onclick="changeSkinColor()">
+                                <i class="fas fa-paint-brush me-2"></i>更換膚色
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-image me-2" style="color: var(--secondary-color);"></i>
+                                背景設定
+                            </h4>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>當前背景</span>
+                                    <span class="free-label">免費</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="background-option selected" style="background: linear-gradient(135deg, #ADD8E6, #87CEEB);" data-bg="sky">
+                                        天空藍
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="background-option" style="background: linear-gradient(135deg, #98FB98, #90EE90);" data-bg="forest">
+                                        森林綠
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="background-option" style="background: linear-gradient(135deg, #FFB6C1, #FFC0CB);" data-bg="pink">
+                                        粉紅色
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="background-option" style="background: linear-gradient(135deg, #DDA0DD, #DA70D6);" data-bg="purple">
+                                        紫色夢
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="background-option" style="background: linear-gradient(135deg, #F0E68C, #F5DEB3);" data-bg="sunset">
+                                        夕陽黃
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="background-option" style="background: linear-gradient(135deg, #FFA07A, #FF7F50);" data-bg="orange">
+                                        橘子橙
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-success w-100 mt-3" onclick="changeBackground()">
+                                <i class="fas fa-image me-2"></i>更換背景
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <h4 class="fw-bold mb-4">
+                                <i class="fas fa-edit me-2" style="color: var(--success-color);"></i>
+                                寵物名稱設定
+                            </h4>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" id="newPetName" placeholder="輸入新的寵物名稱" value="小可愛">
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-primary w-100" onclick="changePetName()">
+                                        <i class="fas fa-save me-2"></i>儲存名稱
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 互動歷史 -->
+            <div class="tab-pane fade" id="history" role="tabpanel">
+                <div class="glass-card p-4">
+                    <h4 class="fw-bold mb-4">
+                        <i class="fas fa-history me-2" style="color: var(--primary-color);"></i>
+                        互動歷史記錄
+                    </h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>時間</th>
+                                    <th>互動類型</th>
+                                    <th>屬性變化</th>
+                                    <th>獲得經驗</th>
+                                    <th>獲得點數</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interactionHistory">
+                                <tr>
+                                    <td>2024-01-15 14:30</td>
+                                    <td><span class="badge bg-warning">餵食</span></td>
+                                    <td>飢餓+10, 心情+5</td>
+                                    <td>+15</td>
+                                    <td>+3</td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-15 14:25</td>
+                                    <td><span class="badge bg-success">玩耍</span></td>
+                                    <td>心情+15, 體力-5</td>
+                                    <td>+20</td>
+                                    <td>+5</td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-15 14:20</td>
+                                    <td><span class="badge bg-info">洗澡</span></td>
+                                    <td>清潔+20, 心情+10</td>
+                                    <td>+25</td>
+                                    <td>+4</td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-15 14:15</td>
+                                    <td><span class="badge bg-primary">哄睡</span></td>
+                                    <td>體力+20, 心情+5</td>
+                                    <td>+18</td>
+                                    <td>+3</td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-15 14:10</td>
+                                    <td><span class="badge bg-warning">餵食</span></td>
+                                    <td>飢餓+10, 心情+5</td>
+                                    <td>+15</td>
+                                    <td>+3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知 -->
+    <div class="notification" id="notification">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-2 text-success"></i>
+            <span id="notificationText">互動成功！</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 寵物數據
+        let petData = {
+            name: '小可愛',
+            level: 12,
+            experience: 1250,
+            maxExperience: 1920,
+            hunger: 75,
+            mood: 60,
+            stamina: 85,
+            cleanliness: 90,
+            health: 95,
+            skinColor: '#ADD8E6',
+            backgroundColor: 'sky'
+        };
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePetDisplay();
+            updateAllAttributes();
+            loadInteractionHistory();
+        });
+
+        // 更新寵物顯示
+        function updatePetDisplay() {
+            const petDisplay = document.getElementById('petDisplay');
+            const levelBadge = document.getElementById('levelBadge');
+            const petName = document.getElementById('petName');
+            const experienceBar = document.getElementById('experienceBar');
+            const currentExp = document.getElementById('currentExp');
+            const maxExp = document.getElementById('maxExp');
+
+            petDisplay.style.background = linear-gradient(135deg, , );
+            levelBadge.textContent = Lv.;
+            petName.textContent = petData.name;
+            
+            const expPercentage = (petData.experience / petData.maxExperience) * 100;
+            experienceBar.style.width = ${expPercentage}%;
+            currentExp.textContent = petData.experience.toLocaleString();
+            maxExp.textContent = petData.maxExperience.toLocaleString();
+
+            // 根據狀態改變寵物表情
+            updatePetExpression();
+        }
+
+        // 更新寵物表情
+        function updatePetExpression() {
+            const petDisplay = document.getElementById('petDisplay');
+            petDisplay.className = 'pet-display';
+            
+            if (petData.hunger < 20) petDisplay.classList.add('hungry');
+            else if (petData.mood < 20) petDisplay.classList.add('sick');
+            else if (petData.stamina < 20) petDisplay.classList.add('tired');
+            else if (petData.cleanliness < 20) petDisplay.classList.add('dirty');
+            else if (petData.mood > 80) petDisplay.classList.add('happy');
+        }
+
+        // 調整顏色亮度
+        function adjustColor(color, amount) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+            const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+            const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+            return #;
+        }
+
+        // 更新所有屬性顯示
+        function updateAllAttributes() {
+            updateAttribute('hunger', petData.hunger);
+            updateAttribute('mood', petData.mood);
+            updateAttribute('stamina', petData.stamina);
+            updateAttribute('cleanliness', petData.cleanliness);
+            updateAttribute('health', petData.health);
+        }
+
+        // 更新單個屬性
+        function updateAttribute(attribute, value) {
+            const bar = document.getElementById(${attribute}Bar);
+            const valueElement = document.getElementById(${attribute}Value);
+            const statusElement = document.getElementById(status);
+            
+            if (bar) bar.style.width = ${value}%;
+            if (valueElement) valueElement.textContent = ${value}/100;
+            if (statusElement) statusElement.textContent = ${value}/100;
+        }
+
+        // 與寵物互動
+        function interactWithPet(action) {
+            let message = '';
+            let expGained = 0;
+            let pointsGained = 0;
+            let changes = {};
+
+            switch(action) {
+                case 'feed':
+                    changes = { hunger: Math.min(100, petData.hunger + 10), mood: Math.min(100, petData.mood + 5) };
+                    message = '餵食成功！寵物很開心！';
+                    expGained = 15;
+                    pointsGained = 3;
+                    break;
+                case 'play':
+                    changes = { mood: Math.min(100, petData.mood + 15), stamina: Math.max(0, petData.stamina - 5) };
+                    message = '玩耍成功！寵物很興奮！';
+                    expGained = 20;
+                    pointsGained = 5;
+                    break;
+                case 'sleep':
+                    changes = { stamina: Math.min(100, petData.stamina + 20), mood: Math.min(100, petData.mood + 5) };
+                    message = '哄睡成功！寵物休息得很好！';
+                    expGained = 18;
+                    pointsGained = 3;
+                    break;
+                case 'clean':
+                    changes = { cleanliness: Math.min(100, petData.cleanliness + 20), mood: Math.min(100, petData.mood + 10) };
+                    message = '洗澡成功！寵物很乾淨！';
+                    expGained = 25;
+                    pointsGained = 4;
+                    break;
+            }
+
+            // 更新寵物數據
+            Object.keys(changes).forEach(key => {
+                petData[key] = changes[key];
+            });
+
+            // 增加經驗和點數
+            petData.experience += expGained;
+            
+            // 檢查是否升級
+            if (petData.experience >= petData.maxExperience) {
+                levelUp();
+            }
+
+            // 更新顯示
+            updatePetDisplay();
+            updateAllAttributes();
+            
+            // 記錄互動歷史
+            addInteractionHistory(action, changes, expGained, pointsGained);
+            
+            // 顯示通知
+            showNotification(message);
+        }
+
+        // 升級
+        function levelUp() {
+            petData.level++;
+            petData.experience -= petData.maxExperience;
+            petData.maxExperience = Math.floor(petData.maxExperience * 1.2);
+            
+            // 升級時恢復所有屬性
+            petData.hunger = 100;
+            petData.mood = 100;
+            petData.stamina = 100;
+            petData.cleanliness = 100;
+            petData.health = 100;
+            
+            showNotification(🎉 恭喜！寵物升級到 Lv.！所有屬性已恢復！);
+        }
+
+        // 更換膚色
+        function changeSkinColor() {
+            const selectedColor = document.querySelector('.color-option.selected');
+            if (selectedColor) {
+                const color = selectedColor.dataset.color;
+                petData.skinColor = color;
+                updatePetDisplay();
+                showNotification('膚色更換成功！');
+            }
+        }
+
+        // 更換背景
+        function changeBackground() {
+            const selectedBg = document.querySelector('.background-option.selected');
+            if (selectedBg) {
+                const bg = selectedBg.dataset.bg;
+                petData.backgroundColor = bg;
+                showNotification('背景更換成功！');
+            }
+        }
+
+        // 更改寵物名稱
+        function changePetName() {
+            const newName = document.getElementById('newPetName').value.trim();
+            if (newName && newName !== petData.name) {
+                petData.name = newName;
+                updatePetDisplay();
+                showNotification(寵物名稱已更改為「」！);
+            }
+        }
+
+        // 顯示通知
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notificationText');
+            
+            text.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 添加互動歷史
+        function addInteractionHistory(action, changes, expGained, pointsGained) {
+            const historyTable = document.getElementById('interactionHistory');
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-TW');
+            
+            const actionNames = {
+                'feed': '餵食',
+                'play': '玩耍',
+                'sleep': '哄睡',
+                'clean': '洗澡'
+            };
+            
+            const changeText = Object.keys(changes).map(key => {
+                const keyNames = {
+                    'hunger': '飢餓',
+                    'mood': '心情',
+                    'stamina': '體力',
+                    'cleanliness': '清潔'
+                };
+                const change = changes[key];
+                return ${keyNames[key]};
+            }).join(', ');
+            
+            const badgeClass = {
+                'feed': 'bg-warning',
+                'play': 'bg-success',
+                'sleep': 'bg-primary',
+                'clean': 'bg-info'
+            };
+            
+            const newRow = 
+                <tr>
+                    <td></td>
+                    <td><span class="badge "></span></td>
+                    <td></td>
+                    <td>+</td>
+                    <td>+</td>
+                </tr>
+            ;
+            
+            historyTable.insertAdjacentHTML('afterbegin', newRow);
+        }
+
+        // 載入互動歷史
+        function loadInteractionHistory() {
+            // 這裡可以從後端載入歷史記錄
+            // 目前使用靜態數據
+        }
+
+        // 顏色選擇
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('color-option')) {
+                document.querySelectorAll('.color-option').forEach(option => option.classList.remove('selected'));
+                e.target.classList.add('selected');
+            }
+            
+            if (e.target.classList.contains('background-option')) {
+                document.querySelectorAll('.background-option').forEach(option => option.classList.remove('selected'));
+                e.target.classList.add('selected');
+            }
+        });
+
+        // 寵物點擊動畫
+        document.getElementById('petDisplay').addEventListener('click', function() {
+            this.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+    </script>
+</body>
+</html>

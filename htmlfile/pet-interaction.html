@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寵物互動系統 - GameSpace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #7557ff;
+            --secondary-color: #34d2ff;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-light: linear-gradient(135deg, #eef3f8 0%, #ffffff 100%);
+            --bg-dark: linear-gradient(135deg, #0c111b 0%, #0a0f18 100%);
+            --text-light: #1f2937;
+            --text-dark: #e5edff;
+            --text-secondary-light: #64748b;
+            --text-secondary-dark: #9fb1c9;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-light);
+            line-height: 1.65;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        body.dark {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-toggle {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pet-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .pet-display {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pet-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .pet-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .pet-name-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pet-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .edit-name-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-name-btn:hover {
+            background: #0ea5e9;
+            transform: translateY(-2px);
+        }
+
+        .pet-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary-light);
+            margin-bottom: 8px;
+        }
+
+        body.dark .stat-label {
+            color: var(--text-secondary-dark);
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .hunger-fill { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .mood-fill { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
+        .stamina-fill { background: linear-gradient(90deg, #06b6d4, #0891b2); }
+        .cleanliness-fill { background: linear-gradient(90deg, #10b981, #059669); }
+        .health-fill { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+        .pet-info {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .pet-level {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .exp-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .exp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .exp-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary-light);
+        }
+
+        body.dark .exp-text {
+            color: var(--text-secondary-dark);
+        }
+
+        .interaction-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .interaction-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .interaction-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .interaction-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .customization-section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .customization-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .customization-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .customization-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .color-picker {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            box-shadow: var(--shadow-hover);
+            z-index: 1000;
+        }
+
+        .color-picker.show {
+            display: block;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-option.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(117, 87, 255, 0.3);
+        }
+
+        .color-cost {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary-light);
+            margin-bottom: 20px;
+        }
+
+        body.dark .color-cost {
+            color: var(--text-secondary-dark);
+        }
+
+        .color-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .color-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .color-confirm {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .color-cancel {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .color-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .background-picker {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            box-shadow: var(--shadow-hover);
+            z-index: 1000;
+        }
+
+        .background-picker.show {
+            display: block;
+        }
+
+        .background-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .background-option {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .background-option:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+        }
+
+        .background-option.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(117, 87, 255, 0.3);
+        }
+
+        .background-free {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--success-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .background-paid {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--warning-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .pet-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .effect-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); opacity: 1; }
+            50% { transform: translateY(-20px); opacity: 0.7; }
+        }
+
+        .pet-mood-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .pet-status-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pet-status-message.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .pet-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .pet-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .interaction-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .customization-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .background-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🐾 GameSpace 寵物系統</div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 暗色模式</button>
+        </div>
+
+        <div class="pet-container">
+            <div class="pet-display">
+                <div class="pet-canvas-container">
+                    <canvas id="petCanvas" class="pet-canvas"></canvas>
+                    <div class="pet-effects" id="petEffects"></div>
+                    <div class="pet-mood-indicator" id="petMoodIndicator">😊</div>
+                    <div class="pet-status-message" id="petStatusMessage"></div>
+                </div>
+                
+                <div class="pet-name-section">
+                    <span class="pet-name" id="petName">我的史萊姆</span>
+                    <button class="edit-name-btn" onclick="editPetName()">✏️ 修改名字</button>
+                </div>
+
+                <div class="pet-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">🍎 飢餓度</div>
+                        <div class="stat-value" id="hungerValue">75</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill hunger-fill" id="hungerBar" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">😊 心情</div>
+                        <div class="stat-value" id="moodValue">60</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill mood-fill" id="moodBar" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">⚡ 體力</div>
+                        <div class="stat-value" id="staminaValue">80</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill stamina-fill" id="staminaBar" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">🧼 清潔度</div>
+                        <div class="stat-value" id="cleanlinessValue">45</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill cleanliness-fill" id="cleanlinessBar" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">❤️ 健康度</div>
+                        <div class="stat-value" id="healthValue">90</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill health-fill" id="healthBar" style="width: 90%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pet-info">
+                <div class="pet-level">
+                    <div class="level-badge">Lv. 3</div>
+                    <div class="exp-bar">
+                        <div class="exp-fill" id="expBar" style="width: 65%"></div>
+                    </div>
+                    <div class="exp-text">經驗值: 65/100</div>
+                </div>
+
+                <div class="interaction-buttons">
+                    <button class="interaction-btn" onclick="feedPet()">
+                        🍎 餵食
+                    </button>
+                    <button class="interaction-btn" onclick="playWithPet()">
+                        🎮 玩耍
+                    </button>
+                    <button class="interaction-btn" onclick="bathePet()">
+                        🛁 洗澡
+                    </button>
+                    <button class="interaction-btn" onclick="sleepPet()">
+                        😴 哄睡
+                    </button>
+                </div>
+
+                <div class="customization-section">
+                    <div class="section-title">🎨 外觀自訂</div>
+                    <div class="customization-grid">
+                        <button class="customization-btn" onclick="changeSkinColor()">
+                            🎨 換膚色<br>
+                            <small>需要 2000 點</small>
+                        </button>
+                        <button class="customization-btn" onclick="changeBackground()">
+                            🌈 換背景<br>
+                            <small>部分免費</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 膚色選擇器 -->
+    <div class="color-picker" id="colorPicker">
+        <h3>選擇寵物膚色</h3>
+        <div class="color-cost">需要花費: 2000 點</div>
+        <div class="color-grid">
+            <div class="color-option" style="background: #4ade80;" data-color="#4ade80"></div>
+            <div class="color-option" style="background: #f87171;" data-color="#f87171"></div>
+            <div class="color-option" style="background: #60a5fa;" data-color="#60a5fa"></div>
+            <div class="color-option" style="background: #a78bfa;" data-color="#a78bfa"></div>
+            <div class="color-option" style="background: #fbbf24;" data-color="#fbbf24"></div>
+            <div class="color-option" style="background: #fb7185;" data-color="#fb7185"></div>
+            <div class="color-option" style="background: #34d399;" data-color="#34d399"></div>
+            <div class="color-option" style="background: #f472b6;" data-color="#f472b6"></div>
+            <div class="color-option" style="background: #818cf8;" data-color="#818cf8"></div>
+            <div class="color-option" style="background: #fbbf24;" data-color="#fbbf24"></div>
+            <div class="color-option" style="background: #06b6d4;" data-color="#06b6d4"></div>
+            <div class="color-option" style="background: #8b5cf6;" data-color="#8b5cf6"></div>
+        </div>
+        <div class="color-actions">
+            <button class="color-btn color-confirm" onclick="confirmSkinColor()">確認</button>
+            <button class="color-btn color-cancel" onclick="cancelSkinColor()">取消</button>
+        </div>
+    </div>
+
+    <!-- 背景選擇器 -->
+    <div class="background-picker" id="backgroundPicker">
+        <h3>選擇背景主題</h3>
+        <div class="background-grid">
+            <div class="background-option" style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe);" data-bg="ocean">
+                <div class="background-free">免費</div>
+            </div>
+            <div class="background-option" style="background: linear-gradient(135deg, #fef3c7, #fde68a);" data-bg="sunset">
+                <div class="background-free">免費</div>
+            </div>
+            <div class="background-option" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff);" data-bg="lavender">
+                <div class="background-free">免費</div>
+            </div>
+            <div class="background-option" style="background: linear-gradient(135deg, #ecfdf5, #d1fae5);" data-bg="forest">
+                <div class="background-free">免費</div>
+            </div>
+            <div class="background-option" style="background: linear-gradient(135deg, #fef2f2, #fecaca);" data-bg="rose">
+                <div class="background-paid">500點</div>
+            </div>
+            <div class="background-option" style="background: linear-gradient(135deg, #f0fdf4, #bbf7d0);" data-bg="mint">
+                <div class="background-paid">500點</div>
+            </div>
+            <div class="background-option" style="background: linear-gradient(135deg, #fefce8, #fef3c7);" data-bg="gold">
+                <div class="background-paid">1000點</div>
+            </div>
+            <div class="background-option" style="background: linear-gradient(135deg, #f8fafc, #e2e8f0);" data-bg="silver">
+                <div class="background-paid">1000點</div>
+            </div>
+        </div>
+        <div class="color-actions">
+            <button class="color-btn color-confirm" onclick="confirmBackground()">確認</button>
+            <button class="color-btn color-cancel" onclick="cancelBackground()">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 寵物數據
+        let petData = {
+            name: "我的史萊姆",
+            level: 3,
+            experience: 65,
+            maxExperience: 100,
+            hunger: 75,
+            mood: 60,
+            stamina: 80,
+            cleanliness: 45,
+            health: 90,
+            skinColor: "#4ade80",
+            background: "ocean",
+            points: 5000
+        };
+
+        let selectedSkinColor = null;
+        let selectedBackground = null;
+        let petAnimation = null;
+        let petMood = "happy";
+
+        // 初始化
+        document.addEventListener("DOMContentLoaded", function() {
+            initializePet();
+            updatePetDisplay();
+            startPetAnimation();
+        });
+
+        // 初始化寵物
+        function initializePet() {
+            const canvas = document.getElementById("petCanvas");
+            const ctx = canvas.getContext("2d");
+            
+            // 設置canvas尺寸
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // 繪製寵物
+            drawPet(ctx);
+        }
+
+        // 繪製寵物 (馬賽克像素風格)
+        function drawPet(ctx) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const pixelSize = 8;
+            
+            // 清除畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 繪製背景
+            drawBackground(ctx);
+            
+            // 繪製史萊姆身體 (像素風格)
+            ctx.fillStyle = petData.skinColor;
+            
+            // 身體主體
+            drawPixelShape(ctx, centerX, centerY, [
+                [0,0,0,1,1,0,0,0],
+                [0,0,1,1,1,1,0,0],
+                [0,1,1,1,1,1,1,0],
+                [1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1],
+                [0,1,1,1,1,1,1,0],
+                [0,0,1,1,1,1,0,0],
+                [0,0,0,1,1,0,0,0]
+            ], pixelSize);
+            
+            // 眼睛
+            ctx.fillStyle = "#ffffff";
+            drawPixelShape(ctx, centerX - 12, centerY - 8, [
+                [1,1,1,1],
+                [1,1,1,1],
+                [1,1,1,1],
+                [1,1,1,1]
+            ], pixelSize);
+            
+            drawPixelShape(ctx, centerX + 12, centerY - 8, [
+                [1,1,1,1],
+                [1,1,1,1],
+                [1,1,1,1],
+                [1,1,1,1]
+            ], pixelSize);
+            
+            // 瞳孔
+            ctx.fillStyle = "#000000";
+            drawPixelShape(ctx, centerX - 8, centerY - 6, [
+                [1,1],
+                [1,1]
+            ], pixelSize);
+            
+            drawPixelShape(ctx, centerX + 8, centerY - 6, [
+                [1,1],
+                [1,1]
+            ], pixelSize);
+            
+            // 嘴巴 (根據心情變化)
+            ctx.fillStyle = "#000000";
+            if (petMood === "happy") {
+                drawPixelShape(ctx, centerX, centerY + 8, [
+                    [0,1,1,0],
+                    [1,0,0,1]
+                ], pixelSize);
+            } else if (petMood === "sad") {
+                drawPixelShape(ctx, centerX, centerY + 12, [
+                    [1,0,0,1],
+                    [0,1,1,0]
+                ], pixelSize);
+            } else if (petMood === "sleepy") {
+                drawPixelShape(ctx, centerX, centerY + 8, [
+                    [0,0,0,0],
+                    [1,1,1,1]
+                ], pixelSize);
+            }
+            
+            // 添加高光效果
+            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+            drawPixelShape(ctx, centerX - 8, centerY - 16, [
+                [1,1],
+                [1,1]
+            ], pixelSize);
+        }
+
+        // 繪製像素形狀
+        function drawPixelShape(ctx, startX, startY, shape, pixelSize) {
+            const offsetX = startX - (shape[0].length * pixelSize) / 2;
+            const offsetY = startY - (shape.length * pixelSize) / 2;
+            
+            for (let y = 0; y < shape.length; y++) {
+                for (let x = 0; x < shape[y].length; x++) {
+                    if (shape[y][x] === 1) {
+                        ctx.fillRect(
+                            offsetX + x * pixelSize,
+                            offsetY + y * pixelSize,
+                            pixelSize,
+                            pixelSize
+                        );
+                    }
+                }
+            }
+        }
+
+        // 繪製背景
+        function drawBackground(ctx) {
+            const gradients = {
+                ocean: ["#f0f9ff", "#e0f2fe"],
+                sunset: ["#fef3c7", "#fde68a"],
+                lavender: ["#f3e8ff", "#e9d5ff"],
+                forest: ["#ecfdf5", "#d1fae5"],
+                rose: ["#fef2f2", "#fecaca"],
+                mint: ["#f0fdf4", "#bbf7d0"],
+                gold: ["#fefce8", "#fef3c7"],
+                silver: ["#f8fafc", "#e2e8f0"]
+            };
+            
+            const gradient = gradients[petData.background] || gradients.ocean;
+            const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            bgGradient.addColorStop(0, gradient[0]);
+            bgGradient.addColorStop(1, gradient[1]);
+            
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // 開始寵物動畫
+        function startPetAnimation() {
+            const canvas = document.getElementById("petCanvas");
+            const ctx = canvas.getContext("2d");
+            
+            function animate() {
+                drawPet(ctx);
+                petAnimation = requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+
+        // 更新寵物顯示
+        function updatePetDisplay() {
+            document.getElementById("petName").textContent = petData.name;
+            document.getElementById("hungerValue").textContent = petData.hunger;
+            document.getElementById("moodValue").textContent = petData.mood;
+            document.getElementById("staminaValue").textContent = petData.stamina;
+            document.getElementById("cleanlinessValue").textContent = petData.cleanliness;
+            document.getElementById("healthValue").textContent = petData.health;
+            
+            document.getElementById("hungerBar").style.width = petData.hunger + "%";
+            document.getElementById("moodBar").style.width = petData.mood + "%";
+            document.getElementById("staminaBar").style.width = petData.stamina + "%";
+            document.getElementById("cleanlinessBar").style.width = petData.cleanliness + "%";
+            document.getElementById("healthBar").style.width = petData.health + "%";
+            
+            document.getElementById("expBar").style.width = (petData.experience / petData.maxExperience * 100) + "%";
+            
+            updatePetMood();
+        }
+
+        // 更新寵物心情
+        function updatePetMood() {
+            const moodIndicator = document.getElementById("petMoodIndicator");
+            
+            if (petData.mood >= 80) {
+                petMood = "happy";
+                moodIndicator.textContent = "😊";
+            } else if (petData.mood >= 50) {
+                petMood = "neutral";
+                moodIndicator.textContent = "😐";
+            } else if (petData.mood >= 20) {
+                petMood = "sad";
+                moodIndicator.textContent = "😢";
+            } else {
+                petMood = "angry";
+                moodIndicator.textContent = "😠";
+            }
+        }
+
+        // 寵物互動功能
+        function feedPet() {
+            if (petData.hunger >= 100) {
+                showNotification("寵物已經吃飽了！", "warning");
+                return;
+            }
+            
+            petData.hunger = Math.min(100, petData.hunger + 20);
+            petData.mood = Math.min(100, petData.mood + 10);
+            petData.health = Math.min(100, petData.health + 5);
+            
+            updatePetDisplay();
+            showPetEffect("🍎", "#f59e0b");
+            showPetStatusMessage("寵物吃得很開心！");
+            showNotification("餵食成功！飢餓度 +20，心情 +10", "success");
+        }
+
+        function playWithPet() {
+            if (petData.stamina <= 0) {
+                showNotification("寵物太累了，需要休息！", "warning");
+                return;
+            }
+            
+            petData.mood = Math.min(100, petData.mood + 25);
+            petData.stamina = Math.max(0, petData.stamina - 15);
+            petData.hunger = Math.max(0, petData.hunger + 5);
+            
+            updatePetDisplay();
+            showPetEffect("🎮", "#8b5cf6");
+            showPetStatusMessage("玩得真開心！");
+            showNotification("玩耍成功！心情 +25，體力 -15", "success");
+        }
+
+        function bathePet() {
+            petData.cleanliness = Math.min(100, petData.cleanliness + 30);
+            petData.mood = Math.min(100, petData.mood + 15);
+            petData.health = Math.min(100, petData.health + 10);
+            
+            updatePetDisplay();
+            showPetEffect("🛁", "#06b6d4");
+            showPetStatusMessage("洗得香香的！");
+            showNotification("洗澡成功！清潔度 +30，心情 +15", "success");
+        }
+
+        function sleepPet() {
+            petData.stamina = Math.min(100, petData.stamina + 40);
+            petData.health = Math.min(100, petData.health + 15);
+            petData.mood = Math.min(100, petData.mood + 10);
+            
+            updatePetDisplay();
+            showPetEffect("😴", "#6b7280");
+            showPetStatusMessage("睡得真香...");
+            showNotification("哄睡成功！體力 +40，健康 +15", "success");
+        }
+
+        // 顯示寵物效果
+        function showPetEffect(emoji, color) {
+            const effectsContainer = document.getElementById("petEffects");
+            const particle = document.createElement("div");
+            particle.className = "effect-particle";
+            particle.textContent = emoji;
+            particle.style.color = color;
+            particle.style.left = Math.random() * 100 + "%";
+            particle.style.top = Math.random() * 100 + "%";
+            particle.style.animationDelay = Math.random() * 2 + "s";
+            
+            effectsContainer.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 2000);
+        }
+
+        // 顯示寵物狀態訊息
+        function showPetStatusMessage(message) {
+            const statusMessage = document.getElementById("petStatusMessage");
+            statusMessage.textContent = message;
+            statusMessage.classList.add("show");
+            
+            setTimeout(() => {
+                statusMessage.classList.remove("show");
+            }, 3000);
+        }
+
+        // 修改寵物名字
+        function editPetName() {
+            const newName = prompt("請輸入新的寵物名字:", petData.name);
+            if (newName && newName.trim() !== "") {
+                petData.name = newName.trim();
+                updatePetDisplay();
+                showNotification("寵物名字已更新！", "success");
+            }
+        }
+
+        // 換膚色
+        function changeSkinColor() {
+            if (petData.points < 2000) {
+                showNotification("點數不足！需要 2000 點", "error");
+                return;
+            }
+            
+            document.getElementById("colorPicker").classList.add("show");
+            
+            // 添加顏色選擇事件
+            document.querySelectorAll(".color-option").forEach(option => {
+                option.addEventListener("click", function() {
+                    document.querySelectorAll(".color-option").forEach(opt => opt.classList.remove("selected"));
+                    this.classList.add("selected");
+                    selectedSkinColor = this.dataset.color;
+                });
+            });
+        }
+
+        function confirmSkinColor() {
+            if (!selectedSkinColor) {
+                showNotification("請選擇一個顏色！", "warning");
+                return;
+            }
+            
+            petData.skinColor = selectedSkinColor;
+            petData.points -= 2000;
+            
+            document.getElementById("colorPicker").classList.remove("show");
+            updatePetDisplay();
+            showNotification("膚色更換成功！花費 2000 點", "success");
+            
+            selectedSkinColor = null;
+            document.querySelectorAll(".color-option").forEach(opt => opt.classList.remove("selected"));
+        }
+
+        function cancelSkinColor() {
+            document.getElementById("colorPicker").classList.remove("show");
+            selectedSkinColor = null;
+            document.querySelectorAll(".color-option").forEach(opt => opt.classList.remove("selected"));
+        }
+
+        // 換背景
+        function changeBackground() {
+            document.getElementById("backgroundPicker").classList.add("show");
+            
+            // 添加背景選擇事件
+            document.querySelectorAll(".background-option").forEach(option => {
+                option.addEventListener("click", function() {
+                    document.querySelectorAll(".background-option").forEach(opt => opt.classList.remove("selected"));
+                    this.classList.add("selected");
+                    selectedBackground = this.dataset.bg;
+                });
+            });
+        }
+
+        function confirmBackground() {
+            if (!selectedBackground) {
+                showNotification("請選擇一個背景！", "warning");
+                return;
+            }
+            
+            const backgroundCosts = {
+                ocean: 0, sunset: 0, lavender: 0, forest: 0,
+                rose: 500, mint: 500, gold: 1000, silver: 1000
+            };
+            
+            const cost = backgroundCosts[selectedBackground];
+            
+            if (petData.points < cost) {
+                showNotification(`點數不足！需要 ${cost} 點`, "error");
+                return;
+            }
+            
+            petData.background = selectedBackground;
+            petData.points -= cost;
+            
+            document.getElementById("backgroundPicker").classList.remove("show");
+            updatePetDisplay();
+            
+            if (cost > 0) {
+                showNotification(`背景更換成功！花費 ${cost} 點`, "success");
+            } else {
+                showNotification("背景更換成功！", "success");
+            }
+            
+            selectedBackground = null;
+            document.querySelectorAll(".background-option").forEach(opt => opt.classList.remove("selected"));
+        }
+
+        function cancelBackground() {
+            document.getElementById("backgroundPicker").classList.remove("show");
+            selectedBackground = null;
+            document.querySelectorAll(".background-option").forEach(opt => opt.classList.remove("selected"));
+        }
+
+        // 顯示通知
+        function showNotification(message, type = "success") {
+            const notification = document.createElement("div");
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add("show");
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove("show");
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // 主題切換
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+            const themeToggle = document.querySelector(".theme-toggle");
+            themeToggle.textContent = document.body.classList.contains("dark") ? "☀️ 亮色模式" : "🌙 暗色模式";
+        }
+
+        // 點擊寵物互動
+        document.getElementById("petCanvas").addEventListener("click", function() {
+            petData.mood = Math.min(100, petData.mood + 5);
+            updatePetDisplay();
+            showPetEffect("💕", "#ec4899");
+            showPetStatusMessage("被摸摸好開心！");
+        });
+
+        // 響應式處理
+        window.addEventListener("resize", function() {
+            const canvas = document.getElementById("petCanvas");
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        });
+    </script>
+</body>
+</html>

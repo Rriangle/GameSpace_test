@@ -465,169 +465,6 @@
         .signin-btn.pulse {
             animation: pulse 2s infinite;
         }
-            /* Enhanced Sign-in Styles */
-        .signin-btn.loading {
-            position: relative;
-            color: transparent;
-        }
-        
-        .signin-btn.loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            border: 2px solid transparent;
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        .signin-btn.celebrate {
-            animation: celebrate 0.6s ease-out;
-        }
-        
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        @keyframes celebrate {
-            0%, 100% { transform: scale(1); }
-            25% { transform: scale(1.1) rotate(5deg); }
-            50% { transform: scale(1.2) rotate(-5deg); }
-            75% { transform: scale(1.1) rotate(5deg); }
-        }
-        
-        /* Notification Styles */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: var(--shadow);
-            animation: slideInRight 0.3s ease-out;
-            max-width: 300px;
-        }
-        
-        .notification-success {
-            border-left: 4px solid var(--success-color);
-        }
-        
-        .notification-error {
-            border-left: 4px solid #ef4444;
-        }
-        
-        .notification-info {
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .notification-icon {
-            font-size: 20px;
-        }
-        
-        .notification-message {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-        
-        .notification.fade-out {
-            animation: slideOutRight 0.3s ease-in forwards;
-        }
-        
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-        
-        /* Confetti Animation */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            top: -10px;
-            z-index: 9999;
-            animation: confetti-fall linear forwards;
-        }
-        
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-        
-        /* Enhanced Calendar Day Styles */
-        .calendar-day.signed {
-            position: relative;
-            overflow: visible;
-        }
-        
-        .calendar-day.signed::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, var(--success-color), var(--primary-color));
-            border-radius: 10px;
-            z-index: -1;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 5px var(--success-color);
-            }
-            to {
-                box-shadow: 0 0 20px var(--success-color), 0 0 30px var(--success-color);
-            }
-        }
-        
-        /* Responsive Notifications */
-        @media (max-width: 768px) {
-            .notification {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                max-width: none;
-            }
-        }
     </style>
 </head>
 <body>
@@ -789,7 +626,7 @@
             const calendarTitle = document.getElementById('calendarTitle');
             
             // Update title
-            calendarTitle.textContent = currentYear + '年' + (currentMonth + 1) + '月';
+            calendarTitle.textContent = ${currentYear}年月;
             
             // Clear grid
             calendarGrid.innerHTML = '';
@@ -823,7 +660,7 @@
                 dayElement.className = 'calendar-day';
                 dayElement.textContent = day;
                 
-                const dateString = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                const dateString = ${currentYear}--;
                 
                 // Check if today
                 if (day === currentDate.getDate() && currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear()) {
@@ -835,7 +672,7 @@
                     dayElement.classList.add('signed');
                     const rewardIcon = document.createElement('div');
                     rewardIcon.className = 'reward-icon';
-                    rewardIcon.textContent = '🎁';
+                    rewardIcon.textContent = '��';
                     dayElement.appendChild(rewardIcon);
                 }
                 
@@ -862,8 +699,8 @@
             const streakCount = document.getElementById('streakCount');
             
             // Check if already signed today
-            const todayDate = new Date();
-            const todayString = todayDate.getFullYear() + '-' + String(todayDate.getMonth() + 1).padStart(2, '0') + '-' + String(todayDate.getDate()).padStart(2, '0');
+            const today = new Date();
+            const todayString = ${today.getFullYear()}--;
             
             if (signedDates.includes(todayString)) {
                 alert('今日已簽到！');
@@ -914,8 +751,8 @@
             generateCalendar();
             
             // Check if already signed today
-            const todayDate = new Date();
-            const todayString = todayDate.getFullYear() + '-' + String(todayDate.getMonth() + 1).padStart(2, '0') + '-' + String(todayDate.getDate()).padStart(2, '0');
+            const today = new Date();
+            const todayString = ${today.getFullYear()}--;
             
             if (signedDates.includes(todayString)) {
                 const signinBtn = document.getElementById('signinBtn');
@@ -923,37 +760,6 @@
                 signinBtn.textContent = '今日已簽到';
             }
         });
-            
-        // Reset sign-in data
-        function resetSignInData() {
-            if (confirm('確定要重置所有簽到數據嗎？此操作無法復原！')) {
-                localStorage.removeItem('signinData');
-                localStorage.removeItem('lastVisit');
-                signedDates.length = 0;
-                document.getElementById('streakCount').textContent = '0';
-                generateCalendar();
-                
-                const signinBtn = document.getElementById('signinBtn');
-                signinBtn.disabled = false;
-                signinBtn.textContent = '📝 立即簽到';
-                
-                showNotification('簽到數據已重置！', 'info');
-            }
-        }
-        
-        // Add reset button functionality
-        function addResetButton() {
-            const signinStatus = document.querySelector('.signin-status');
-            const resetBtn = document.createElement('button');
-            resetBtn.className = 'signin-btn';
-            resetBtn.style.background = '#ef4444';
-            resetBtn.style.marginTop = '16px';
-            resetBtn.textContent = '🔄 重置數據';
-            resetBtn.onclick = resetSignInData;
-            signinStatus.appendChild(resetBtn);
-        }
     </script>
 </body>
 </html>
-
-

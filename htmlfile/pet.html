@@ -550,6 +550,332 @@
         .pet-canvas.bounce {
             animation: bounce 1s;
         }
+            /* Enhanced Pet Interaction Styles */
+        .pet-canvas {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .pet-canvas.interacting {
+            animation: petInteract 0.5s ease-out;
+        }
+        
+        @keyframes petInteract {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1) rotate(5deg); }
+            50% { transform: scale(1.2) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+            100% { transform: scale(1); }
+        }
+        
+        .pet-canvas.dragging {
+            opacity: 0.8;
+            transform: scale(1.1);
+            z-index: 1000;
+        }
+        
+        /* Pet Mood Indicators */
+        .mood-indicator {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .mood-indicator.show {
+            opacity: 1;
+            animation: moodFloat 2s ease-out forwards;
+        }
+        
+        @keyframes moodFloat {
+            0% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) translateY(-20px);
+                opacity: 0;
+            }
+        }
+        
+        /* Pet Speech Bubble */
+        .speech-bubble {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            max-width: 200px;
+            text-align: center;
+        }
+        
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid var(--glass-border);
+        }
+        
+        .speech-bubble.show {
+            opacity: 1;
+            animation: speechFloat 3s ease-out forwards;
+        }
+        
+        @keyframes speechFloat {
+            0% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            80% {
+                transform: translateX(-50%) translateY(-10px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) translateY(-20px);
+                opacity: 0;
+            }
+        }
+        
+        /* Pet Status Effects */
+        .status-effect {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: statusPulse 2s infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        .status-happy { background: #22c55e; color: white; }
+        .status-sad { background: #ef4444; color: white; }
+        .status-hungry { background: #f59e0b; color: white; }
+        .status-sleepy { background: #8b5cf6; color: white; }
+        
+        /* Pet Interaction Feedback */
+        .interaction-feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        .interaction-feedback.show {
+            opacity: 1;
+            animation: feedbackPop 1.5s ease-out forwards;
+        }
+        
+        @keyframes feedbackPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+        }
+        
+        /* Pet Mini-Games */
+        .mini-game {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .mini-game.show {
+            display: flex;
+        }
+        
+        .mini-game-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .mini-game-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        
+        .mini-game-canvas {
+            width: 300px;
+            height: 200px;
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            margin: 20px auto;
+            cursor: crosshair;
+        }
+        
+        .mini-game-score {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+        
+        .mini-game-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .mini-game-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .mini-game-btn:hover {
+            background: #6b46e5;
+            transform: translateY(-2px);
+        }
+        
+        /* Pet Evolution */
+        .evolution-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .evolution-overlay.show {
+            display: flex;
+        }
+        
+        .evolution-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .evolution-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .evolution-pet {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: evolutionGlow 2s infinite alternate;
+        }
+        
+        @keyframes evolutionGlow {
+            from { box-shadow: 0 0 20px var(--primary-color); }
+            to { box-shadow: 0 0 40px var(--primary-color), 0 0 60px var(--primary-color); }
+        }
+        
+        /* Responsive Enhancements */
+        @media (max-width: 768px) {
+            .mini-game-canvas {
+                width: 250px;
+                height: 150px;
+            }
+            
+            .evolution-pet {
+                width: 120px;
+                height: 120px;
+                font-size: 50px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -725,6 +1051,34 @@
                 </div>
             </div>
         </div>
+                <!-- Pet Mini-Game -->
+            <div class="mini-game" id="miniGame">
+                <div class="mini-game-content">
+                    <h3 class="mini-game-title">🎯 寵物小遊戲</h3>
+                    <canvas class="mini-game-canvas" id="miniGameCanvas" width="300" height="200"></canvas>
+                    <div class="mini-game-score" id="miniGameScore">分數: 0</div>
+                    <div class="mini-game-controls">
+                        <button class="mini-game-btn" onclick="startMiniGame()">開始遊戲</button>
+                        <button class="mini-game-btn" onclick="closeMiniGame()">關閉</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pet Evolution -->
+            <div class="evolution-overlay" id="evolutionOverlay">
+                <div class="evolution-content">
+                    <h2 class="evolution-title">🌟 寵物進化！</h2>
+                    <div class="evolution-pet" id="evolutionPet">🐾</div>
+                    <p style="color: var(--text-primary); font-size: 16px; margin: 20px 0;">
+                        恭喜！您的寵物進化了！<br>
+                        獲得了新的能力和外觀！
+                    </p>
+                    <button class="mini-game-btn" onclick="closeEvolution()">太棒了！</button>
+                </div>
+            </div>
+
+            <!-- Interaction Feedback -->
+            <div class="interaction-feedback" id="interactionFeedback"></div>
     </main>
 
     <script>
@@ -742,7 +1096,493 @@
             document.querySelector('.theme-toggle').textContent = '☀️';
         }
 
-        // Pet data
+                // Enhanced Pet Data
+        let petData = {
+            name: '我的史萊姆',
+            level: 3,
+            experience: 130,
+            maxExperience: 200,
+            hunger: 75,
+            mood: 60,
+            stamina: 85,
+            cleanliness: 70,
+            health: 90,
+            skinColor: '#4ecdc4',
+            background: 'gradient1',
+            clickCount: 0,
+            lastInteraction: Date.now(),
+            evolutionStage: 1,
+            miniGameScore: 0
+        };
+
+        // Pet interaction variables
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let petPosition = { x: 0, y: 0 };
+
+        // Enhanced Pet Drawing with Status Effects
+        function drawPet() {
+            const canvas = document.getElementById('petCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            const backgrounds = {
+                'gradient1': ['#ff6b6b', '#4ecdc4'],
+                'gradient2': ['#45b7d1', '#96c7ed'],
+                'gradient3': ['#96ceb4', '#a8e6cf'],
+                'gradient4': ['#feca57', '#ff9ff3'],
+                'gradient5': ['#667eea', '#764ba2'],
+                'gradient6': ['#f093fb', '#f5576c']
+            };
+            
+            const bgColors = backgrounds[petData.background] || backgrounds['gradient1'];
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, bgColors[0]);
+            gradient.addColorStop(1, bgColors[1]);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw pet body (slime) with evolution stages
+            const bodySize = 60 + (petData.evolutionStage * 10);
+            ctx.fillStyle = petData.skinColor;
+            ctx.beginPath();
+            ctx.arc(100, 140, bodySize, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Add shine effect
+            const shineGradient = ctx.createRadialGradient(80, 120, 0, 80, 120, 30);
+            shineGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+            shineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = shineGradient;
+            ctx.beginPath();
+            ctx.arc(80, 120, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw eyes with different expressions
+            ctx.fillStyle = '#2c3e50';
+            const eyeSize = 6 + (petData.evolutionStage * 1);
+            ctx.beginPath();
+            ctx.arc(85, 125, eyeSize, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(115, 125, eyeSize, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw eye highlights
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(87, 123, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(117, 123, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw mouth based on mood and evolution
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 3 + petData.evolutionStage;
+            if (petData.mood > 70) {
+                // Happy smile
+                ctx.beginPath();
+                ctx.arc(100, 145, 15 + petData.evolutionStage * 2, 0, Math.PI);
+                ctx.stroke();
+            } else if (petData.mood > 40) {
+                // Neutral mouth
+                ctx.beginPath();
+                ctx.moveTo(90, 145);
+                ctx.lineTo(110, 145);
+                ctx.stroke();
+            } else {
+                // Sad mouth
+                ctx.beginPath();
+                ctx.arc(100, 155, 15 + petData.evolutionStage * 2, Math.PI, 0);
+                ctx.stroke();
+            }
+            
+            // Add sparkle effects based on mood
+            if (petData.mood > 60) {
+                ctx.fillStyle = '#ffd700';
+                for (let i = 0; i < 5 + petData.evolutionStage; i++) {
+                    const x = 20 + Math.random() * 160;
+                    const y = 20 + Math.random() * 160;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Draw status effects
+            drawStatusEffects(ctx);
+        }
+
+        // Draw status effects
+        function drawStatusEffects(ctx) {
+            const effects = [];
+            
+            if (petData.hunger < 30) effects.push({ icon: '🍎', color: '#f59e0b', x: 160, y: 20 });
+            if (petData.mood < 30) effects.push({ icon: '😢', color: '#ef4444', x: 180, y: 20 });
+            if (petData.stamina < 30) effects.push({ icon: '😴', color: '#8b5cf6', x: 160, y: 40 });
+            if (petData.cleanliness < 30) effects.push({ icon: '🧼', color: '#06b6d4', x: 180, y: 40 });
+            
+            effects.forEach(effect => {
+                ctx.fillStyle = effect.color;
+                ctx.beginPath();
+                ctx.arc(effect.x, effect.y, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(effect.icon, effect.x, effect.y + 3);
+            });
+        }
+
+        // Enhanced Pet Click Interaction
+        function setupPetInteraction() {
+            const canvas = document.getElementById('petCanvas');
+            
+            // Click interaction
+            canvas.addEventListener('click', function(e) {
+                petData.clickCount++;
+                const canvas = document.getElementById('petCanvas');
+                canvas.classList.add('interacting');
+                
+                // Show mood indicator
+                showMoodIndicator();
+                
+                // Show speech bubble
+                showSpeechBubble();
+                
+                // Update mood based on clicks
+                petData.mood = Math.min(100, petData.mood + 2);
+                updateStatsDisplay();
+                
+                setTimeout(() => {
+                    canvas.classList.remove('interacting');
+                }, 500);
+            });
+            
+            // Drag interaction
+            canvas.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                canvas.classList.add('dragging');
+                
+                const rect = canvas.getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+                
+                canvas.style.position = 'fixed';
+                canvas.style.pointerEvents = 'none';
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    const canvas = document.getElementById('petCanvas');
+                    canvas.style.left = (e.clientX - dragOffset.x) + 'px';
+                    canvas.style.top = (e.clientY - dragOffset.y) + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    const canvas = document.getElementById('petCanvas');
+                    canvas.classList.remove('dragging');
+                    canvas.style.position = '';
+                    canvas.style.left = '';
+                    canvas.style.top = '';
+                    canvas.style.pointerEvents = '';
+                    
+                    // Reward for dragging
+                    petData.mood = Math.min(100, petData.mood + 1);
+                    petData.stamina = Math.max(0, petData.stamina - 2);
+                    updateStatsDisplay();
+                }
+            });
+        }
+
+        // Show mood indicator
+        function showMoodIndicator() {
+            const canvas = document.getElementById('petCanvas');
+            const container = canvas.parentElement;
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'mood-indicator';
+            
+            let message = '';
+            if (petData.mood > 80) message = '😊 很開心！';
+            else if (petData.mood > 60) message = '😄 心情不錯';
+            else if (petData.mood > 40) message = '😐 普通';
+            else if (petData.mood > 20) message = '😔 有點難過';
+            else message = '😢 很傷心';
+            
+            indicator.textContent = message;
+            container.appendChild(indicator);
+            
+            setTimeout(() => {
+                indicator.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                indicator.remove();
+            }, 2000);
+        }
+
+        // Show speech bubble
+        function showSpeechBubble() {
+            const canvas = document.getElementById('petCanvas');
+            const container = canvas.parentElement;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'speech-bubble';
+            
+            const messages = [
+                '主人，你好！',
+                '陪我玩吧！',
+                '我餓了...',
+                '謝謝你照顧我！',
+                '我好開心！',
+                '再點我一下！',
+                '我愛你！',
+                '今天天氣真好！'
+            ];
+            
+            bubble.textContent = messages[Math.floor(Math.random() * messages.length)];
+            container.appendChild(bubble);
+            
+            setTimeout(() => {
+                bubble.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                bubble.remove();
+            }, 3000);
+        }
+
+        // Show interaction feedback
+        function showInteractionFeedback(message) {
+            const feedback = document.getElementById('interactionFeedback');
+            feedback.textContent = message;
+            feedback.classList.add('show');
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 1500);
+        }
+
+        // Enhanced Pet Actions with Feedback
+        function petAction(action) {
+            const actions = {
+                'feed': { hunger: 20, mood: 10, stamina: -5, cleanliness: -5, message: '🍎 史萊姆吃得很開心！' },
+                'play': { hunger: -10, mood: 15, stamina: -15, health: 5, message: '🎾 史萊姆玩得很興奮！' },
+                'bath': { cleanliness: 25, mood: 5, stamina: -5, message: '🛁 史萊姆變得乾淨閃亮！' },
+                'sleep': { stamina: 20, health: 10, mood: 5, hunger: -5, message: '😴 史萊姆睡得很香甜！' },
+                'train': { stamina: -10, mood: 5, health: 5, experience: 5, message: '🏋️ 史萊姆變得更強壯了！' },
+                'heal': { health: 20, stamina: 10, mood: 10, message: '💊 史萊姆恢復了健康！' }
+            };
+            
+            const effect = actions[action];
+            if (!effect) return;
+            
+            // Update stats
+            Object.keys(effect).forEach(stat => {
+                if (stat === 'experience') {
+                    petData[stat] = Math.min(petData.maxExperience, petData[stat] + effect[stat]);
+                    // Check for level up
+                    if (petData.experience >= petData.maxExperience) {
+                        levelUp();
+                    }
+                } else if (stat !== 'message') {
+                    petData[stat] = Math.max(0, Math.min(100, petData[stat] + effect[stat]));
+                }
+            });
+            
+            // Update display
+            updateStatsDisplay();
+            drawPet();
+            
+            // Show enhanced feedback
+            showInteractionFeedback(effect.message);
+            
+            // Add bounce animation
+            const canvas = document.getElementById('petCanvas');
+            canvas.classList.add('bounce');
+            setTimeout(() => {
+                canvas.classList.remove('bounce');
+            }, 1000);
+        }
+
+        // Enhanced Level Up with Evolution
+        function levelUp() {
+            petData.level++;
+            petData.experience = 0;
+            petData.maxExperience = Math.floor(petData.maxExperience * 1.5);
+            
+            // Increase all stats slightly
+            petData.hunger = Math.min(100, petData.hunger + 10);
+            petData.mood = Math.min(100, petData.mood + 10);
+            petData.stamina = Math.min(100, petData.stamina + 10);
+            petData.cleanliness = Math.min(100, petData.cleanliness + 10);
+            petData.health = Math.min(100, petData.health + 10);
+            
+            document.getElementById('petLevel').textContent = 'Lv.' + petData.level;
+            
+            // Check for evolution
+            if (petData.level % 5 === 0) {
+                petData.evolutionStage++;
+                showEvolution();
+            } else {
+                showInteractionFeedback('恭喜！史萊姆升到 Lv.' + petData.level + '！所有屬性都提升了！');
+            }
+            
+            updateStatsDisplay();
+        }
+
+        // Show evolution
+        function showEvolution() {
+            const overlay = document.getElementById('evolutionOverlay');
+            const pet = document.getElementById('evolutionPet');
+            
+            // Update evolution pet appearance
+            pet.style.background = `linear-gradient(135deg, ${petData.skinColor}, ${adjustColorBrightness(petData.skinColor, 20)})`;
+            pet.textContent = getEvolutionEmoji(petData.evolutionStage);
+            
+            overlay.classList.add('show');
+        }
+
+        // Close evolution
+        function closeEvolution() {
+            document.getElementById('evolutionOverlay').classList.remove('show');
+            drawPet();
+        }
+
+        // Get evolution emoji
+        function getEvolutionEmoji(stage) {
+            const emojis = ['🐾', '🌟', '✨', '💫', '🔥', '⚡', '🌈', '🎆'];
+            return emojis[Math.min(stage - 1, emojis.length - 1)];
+        }
+
+        // Adjust color brightness
+        function adjustColorBrightness(hex, percent) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        // Mini-game functions
+        function startMiniGame() {
+            const game = document.getElementById('miniGame');
+            game.classList.add('show');
+            
+            const canvas = document.getElementById('miniGameCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            petData.miniGameScore = 0;
+            updateMiniGameScore();
+            
+            // Simple click game
+            canvas.addEventListener('click', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Create explosion effect
+                createExplosion(ctx, x, y);
+                petData.miniGameScore += 10;
+                updateMiniGameScore();
+                
+                // Reward pet
+                petData.mood = Math.min(100, petData.mood + 1);
+                petData.experience = Math.min(petData.maxExperience, petData.experience + 2);
+                updateStatsDisplay();
+            });
+            
+            // Draw targets
+            drawMiniGameTargets(ctx);
+        }
+
+        function createExplosion(ctx, x, y) {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#feca57'];
+            
+            for (let i = 0; i < 10; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const angle = (Math.PI * 2 * i) / 10;
+                const distance = 20 + Math.random() * 30;
+                
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x + Math.cos(angle) * distance, y + Math.sin(angle) * distance, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawMiniGameTargets(ctx) {
+            ctx.clearRect(0, 0, 300, 200);
+            
+            // Draw background
+            const gradient = ctx.createLinearGradient(0, 0, 300, 200);
+            gradient.addColorStop(0, '#4ecdc4');
+            gradient.addColorStop(1, '#44a08d');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 300, 200);
+            
+            // Draw targets
+            for (let i = 0; i < 5; i++) {
+                const x = 50 + i * 50;
+                const y = 100;
+                
+                ctx.fillStyle = '#ff6b6b';
+                ctx.beginPath();
+                ctx.arc(x, y, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('🎯', x, y + 4);
+            }
+        }
+
+        function updateMiniGameScore() {
+            document.getElementById('miniGameScore').textContent = '分數: ' + petData.miniGameScore;
+        }
+
+        function closeMiniGame() {
+            document.getElementById('miniGame').classList.remove('show');
+            
+            // Final reward based on score
+            if (petData.miniGameScore > 50) {
+                petData.mood = Math.min(100, petData.mood + 5);
+                petData.experience = Math.min(petData.maxExperience, petData.experience + 10);
+                showInteractionFeedback('🎉 遊戲結束！史萊姆很開心！');
+            }
+            
+            updateStatsDisplay();
+        }
+
+        // Save and load pet data
+        function savePetData() {
+            localStorage.setItem('petData', JSON.stringify(petData));
+        }
+
+        function loadPetData() {
+            const savedData = localStorage.getItem('petData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    Object.assign(petData, data);
+                } catch (error) {
+                    console.error('載入寵物資料失敗:', error);
+                }
+            }
+        }
         let petData = {
             name: '我的史萊姆',
             level: 3,
@@ -860,7 +1700,7 @@
             document.getElementById('healthValue').textContent = petData.health + '%';
             document.getElementById('healthBar').style.width = petData.health + '%';
             
-            document.getElementById('expText').textContent = ${petData.experience} /  XP;
+            document.getElementById('expText').textContent = petData.experience + ' / ' + petData.maxExperience + ' XP';
             document.getElementById('expFill').style.width = (petData.experience / petData.maxExperience * 100) + '%';
         }
 
@@ -928,8 +1768,8 @@
             petData.cleanliness = Math.min(100, petData.cleanliness + 10);
             petData.health = Math.min(100, petData.health + 10);
             
-            document.getElementById('petLevel').textContent = Lv.;
-            alert(恭喜！史萊姆升到 Lv.！所有屬性都提升了！);
+            document.getElementById('petLevel').textContent = 'Lv.' + petData.level;
+            alert('恭喜！史萊姆升到 Lv.' + petData.level + '！所有屬性都提升了！');
             
             updateStatsDisplay();
         }
@@ -937,7 +1777,7 @@
         // Change skin color
         function changeSkinColor(color, cost) {
             if (cost > 0) {
-                if (confirm(確定要花費  點數更換膚色嗎？)) {
+                if (confirm('確定要花費 ' + cost + ' 點數更換膚色嗎？')) {
                     petData.skinColor = color;
                     drawPet();
                     
@@ -964,7 +1804,7 @@
         // Change background
         function changeBackground(bg, cost) {
             if (cost > 0) {
-                if (confirm(確定要花費  點數更換背景嗎？)) {
+                if (confirm('確定要花費 ' + cost + ' 點數更換背景嗎？')) {
                     petData.background = bg;
                     drawPet();
                     
@@ -988,8 +1828,25 @@
             }
         }
 
-        // Initialize
+        // Enhanced Initialize with all interactions
         document.addEventListener('DOMContentLoaded', function() {
+            // Load saved pet data
+            loadPetData();
+            
+            // Setup pet interactions
+            setupPetInteraction();
+            
+            // Initial draw
+            drawPet();
+            updateStatsDisplay();
+            
+            // Add mini-game button to actions
+            const actionsGrid = document.querySelector(''.actions-grid'');
+            const miniGameBtn = document.createElement(''button'');
+            miniGameBtn.className = ''action-btn'';
+            miniGameBtn.innerHTML = ''🎮 小遊戲'';
+            miniGameBtn.onclick = startMiniGame;
+            actionsGrid.appendChild(miniGameBtn);
             drawPet();
             updateStatsDisplay();
             
@@ -1002,7 +1859,7 @@
                 }, 1000);
             }, 3000);
             
-            // Simulate stat changes over time
+            // Auto-save pet data every 30 seconds`n            setInterval(() => {`n                savePetData();`n            }, 30000);`n            `n            // Simulate stat changes over time
             setInterval(() => {
                 // Gradually decrease stats
                 petData.hunger = Math.max(0, petData.hunger - 1);
@@ -1016,3 +1873,4 @@
     </script>
 </body>
 </html>
+

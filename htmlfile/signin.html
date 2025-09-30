@@ -1,765 +1,385 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>每日簽到 - GameSpace</title>
-    <style>
-        :root {
-            --primary-color: #7557ff;
-            --secondary-color: #34d2ff;
-            --success-color: #22c55e;
-            --text-primary: #1f2937;
-            --text-secondary: #64748b;
-            --bg-primary: #eef3f8;
-            --bg-secondary: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.25);
-            --glass-border: rgba(255, 255, 255, 0.18);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員簽到系統 - GameSpace</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --text: #212529;
+      --muted: #6c757d;
+      --line: #dee2e6;
+      --accent: #007bff;
+      --accent-hover: #0056b3;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --shadow: 0 2px 4px rgba(0,0,0,0.1);
+      --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --blur: 8px;
+      --spacing: 16px;
+      --spacing-sm: 8px;
+      --spacing-lg: 24px;
+    }
 
-        body.dark {
-            --text-primary: #e5edff;
-            --text-secondary: #9fb1c9;
-            --bg-primary: #0c111b;
-            --bg-secondary: #0a0f18;
-            --glass-bg: rgba(0, 0, 0, 0.25);
-            --glass-border: rgba(255, 255, 255, 0.125);
-        }
+    body.dark {
+      --bg: #1a1a1a;
+      --surface: #2d2d2d;
+      --text: #ffffff;
+      --muted: #adb5bd;
+      --line: #495057;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            color: var(--text-primary);
-            line-height: 1.65;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                padding: 0 24px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .container {
-                padding: 0 32px;
-            }
-        }
-
-        /* Header */
-        .header {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .nav {
-            display: flex;
-            gap: 24px;
-        }
-
-        .nav a {
-            color: var(--text-primary);
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .nav a:hover {
-            background: var(--glass-bg);
-            color: var(--primary-color);
-        }
-
-        .theme-toggle {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: #6b46e5;
-            transform: translateY(-2px);
-        }
-
-        /* Main Content */
-        .main-content {
-            padding: 32px 0;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 36px;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .page-subtitle {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
-
-        /* Sign-in Status */
-        .signin-status {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .streak-display {
-            font-size: 48px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 8px;
-        }
-
-        .streak-label {
-            color: var(--text-secondary);
-            font-size: 18px;
-            margin-bottom: 24px;
-        }
-
-        .signin-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 8px;
-        }
-
-        .signin-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px 0 rgba(117, 87, 255, 0.4);
-        }
-
-        .signin-btn:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Calendar */
-        .calendar-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .calendar-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 8px;
-        }
-
-        .calendar-nav-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .calendar-nav-btn:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-        }
-
-        .calendar-day-header {
-            text-align: center;
-            padding: 12px 8px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .calendar-day.other-month {
-            color: var(--text-secondary);
-            opacity: 0.5;
-        }
-
-        .calendar-day.today {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .calendar-day.signed {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .calendar-day:hover:not(.other-month) {
-            background: var(--glass-bg);
-            transform: scale(1.1);
-        }
-
-        .reward-icon {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            font-size: 10px;
-        }
-
-        /* Rewards */
-        .rewards-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-        }
-
-        .rewards-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-        }
-
-        .rewards-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .reward-item {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .reward-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px 0 rgba(31, 38, 135, 0.3);
-        }
-
-        .reward-icon-large {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .reward-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .reward-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        /* History */
-        .history-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .history-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-        }
-
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-date {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .history-rewards {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .reward-badge {
-            background: var(--success-color);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .reward-badge.points {
-            background: var(--primary-color);
-        }
-
-        .reward-badge.exp {
-            background: var(--secondary-color);
-        }
-
-        .reward-badge.coupon {
-            background: #f59e0b;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 28px;
-            }
-            
-            .streak-display {
-                font-size: 36px;
-            }
-            
-            .nav {
-                display: none;
-            }
-            
-            .calendar-grid {
-                gap: 4px;
-            }
-            
-            .calendar-day {
-                font-size: 12px;
-            }
-            
-            .rewards-list {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .calendar-container,
-        .rewards-container,
-        .history-container {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .calendar-container { animation-delay: 0.1s; }
-        .rewards-container { animation-delay: 0.2s; }
-        .history-container { animation-delay: 0.3s; }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .signin-btn.pulse {
-            animation: pulse 2s infinite;
-        }
-    </style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: var(--spacing); }
+    
+    .header { background: var(--surface); border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); box-shadow: var(--shadow); }
+    .header h1 { font-size: 2rem; margin-bottom: var(--spacing-sm); }
+    .header p { color: var(--muted); }
+    
+    .nav { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+    .nav a { padding: var(--spacing-sm) var(--spacing); background: var(--surface); border-radius: var(--radius); text-decoration: none; color: var(--text); box-shadow: var(--shadow); transition: all 0.2s; }
+    .nav a:hover { background: var(--accent); color: white; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg); }
+    .card { background: var(--surface); border-radius: var(--radius-lg); padding: var(--spacing-lg); box-shadow: var(--shadow); }
+    .card h3 { margin-bottom: var(--spacing); color: var(--accent); }
+    
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: var(--spacing); }
+    .calendar-header { text-align: center; padding: var(--spacing-sm); background: var(--accent); color: white; font-weight: bold; }
+    .calendar-day { padding: var(--spacing-sm); text-align: center; background: var(--surface); border: 1px solid var(--line); cursor: pointer; transition: all 0.2s; }
+    .calendar-day:hover { background: var(--accent); color: white; }
+    .calendar-day.signed { background: var(--success); color: white; }
+    .calendar-day.today { background: var(--warning); color: var(--text); font-weight: bold; }
+    .calendar-day.other-month { color: var(--muted); background: #f8f9fa; }
+    
+    .btn { padding: var(--spacing-sm) var(--spacing); background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .btn:hover { background: var(--accent-hover); }
+    .btn.success { background: var(--success); }
+    .btn.warning { background: var(--warning); color: var(--text); }
+    .btn:disabled { background: var(--muted); cursor: not-allowed; }
+    
+    .list { list-style: none; }
+    .list li { padding: var(--spacing-sm); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+    .list li:last-child { border-bottom: none; }
+    
+    .streak { text-align: center; padding: var(--spacing-lg); background: linear-gradient(135deg, var(--success), var(--info)); color: white; border-radius: var(--radius-lg); margin-bottom: var(--spacing-lg); }
+    .streak h2 { font-size: 3rem; margin-bottom: var(--spacing-sm); }
+    .streak p { opacity: 0.9; }
+    
+    .reward { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm); background: var(--surface); border-radius: var(--radius); margin-bottom: var(--spacing-sm); }
+    .reward-icon { font-size: 1.5rem; }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal.show { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: var(--surface); border-radius: var(--radius-lg); padding: var(--spacing-lg); max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing); }
+    .modal-header h3 { margin: 0; }
+    .close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted); }
+    
+    @media (max-width: 768px) {
+      .container { padding: var(--spacing-sm); }
+      .grid { grid-template-columns: 1fr; }
+      .streak h2 { font-size: 2rem; }
+    }
+  </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="index.html" class="logo">🎮 GameSpace</a>
-                <nav class="nav">
-                    <a href="index.html">首頁</a>
-                    <a href="wallet.html">會員錢包</a>
-                    <a href="signin.html">每日簽到</a>
-                    <a href="pet.html">寵物系統</a>
-                    <a href="minigame.html">小遊戲</a>
-                </nav>
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </div>
+  <div class="container">
+    <div class="header">
+      <h1>📅 會員簽到系統</h1>
+      <p>每日簽到獲得獎勵，連續簽到有額外獎勵！</p>
+    </div>
+    
+    <nav class="nav">
+      <a href="index.html">🏠 首頁</a>
+      <a href="wallet.html">💰 會員錢包</a>
+      <a href="signin.html">📅 簽到系統</a>
+      <a href="pet.html">🐾 寵物系統</a>
+      <a href="minigame.html">🎮 小遊戲</a>
+    </nav>
+    
+    <div class="streak">
+      <h2 id="streak">7</h2>
+      <p>連續簽到天數</p>
+    </div>
+    
+    <div class="grid">
+      <div class="card">
+        <h3>📅 本月簽到日曆</h3>
+        <div class="calendar" id="calendar">
+          <!-- 日曆將由JavaScript生成 -->
         </div>
-    </header>
-
-    <main class="main-content">
-        <div class="container">
-            <div class="page-header">
-                <h1 class="page-title">📅 每日簽到</h1>
-                <p class="page-subtitle">每日簽到獲得獎勵，連續簽到還有額外驚喜！</p>
-            </div>
-
-            <!-- Sign-in Status -->
-            <div class="signin-status">
-                <div class="streak-display" id="streakCount">7</div>
-                <div class="streak-label">連續簽到天數</div>
-                <button class="signin-btn" id="signinBtn" onclick="performSignIn()">📝 立即簽到</button>
-                <button class="signin-btn" onclick="showHistory()">📊 查看歷史</button>
-            </div>
-
-            <!-- Calendar -->
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <h2 class="calendar-title" id="calendarTitle">2024年12月</h2>
-                    <div class="calendar-nav">
-                        <button class="calendar-nav-btn" onclick="changeMonth(-1)">‹</button>
-                        <button class="calendar-nav-btn" onclick="changeMonth(1)">›</button>
-                    </div>
-                </div>
-                <div class="calendar-grid" id="calendarGrid">
-                    <!-- Calendar will be generated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Today's Rewards -->
-            <div class="rewards-container">
-                <h3 class="rewards-title">今日簽到獎勵</h3>
-                <div class="rewards-list">
-                    <div class="reward-item">
-                        <div class="reward-icon-large">💰</div>
-                        <div class="reward-name">會員點數</div>
-                        <div class="reward-desc">+20 點</div>
-                    </div>
-                    <div class="reward-item">
-                        <div class="reward-icon-large">🐾</div>
-                        <div class="reward-name">寵物經驗</div>
-                        <div class="reward-desc">+10 經驗</div>
-                    </div>
-                    <div class="reward-item">
-                        <div class="reward-icon-large">🎁</div>
-                        <div class="reward-name">連續獎勵</div>
-                        <div class="reward-desc">7天獎勵券</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sign-in History -->
-            <div class="history-container">
-                <h3 class="history-title">簽到歷史紀錄</h3>
-                <div class="history-item">
-                    <div class="history-date">2024-12-15</div>
-                    <div class="history-rewards">
-                        <span class="reward-badge points">+20點</span>
-                        <span class="reward-badge exp">+10經驗</span>
-                        <span class="reward-badge coupon">85折券</span>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-date">2024-12-14</div>
-                    <div class="history-rewards">
-                        <span class="reward-badge points">+20點</span>
-                        <span class="reward-badge exp">+10經驗</span>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-date">2024-12-13</div>
-                    <div class="history-rewards">
-                        <span class="reward-badge points">+20點</span>
-                        <span class="reward-badge exp">+10經驗</span>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-date">2024-12-12</div>
-                    <div class="history-rewards">
-                        <span class="reward-badge points">+20點</span>
-                        <span class="reward-badge exp">+10經驗</span>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-date">2024-12-11</div>
-                    <div class="history-rewards">
-                        <span class="reward-badge points">+20點</span>
-                        <span class="reward-badge exp">+10經驗</span>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-date">2024-12-10</div>
-                    <div class="history-rewards">
-                        <span class="reward-badge points">+20點</span>
-                        <span class="reward-badge exp">+10經驗</span>
-                    </div>
-                </div>
-                <div class="history-item">
-                    <div class="history-date">2024-12-09</div>
-                    <div class="history-rewards">
-                        <span class="reward-badge points">+20點</span>
-                        <span class="reward-badge exp">+10經驗</span>
-                        <span class="reward-badge coupon">免運券</span>
-                    </div>
-                </div>
-            </div>
+        <div style="text-align: center; margin-top: var(--spacing);">
+          <button class="btn success" id="signBtn" onclick="signIn()">今日簽到</button>
         </div>
-    </main>
-
-    <script>
-        // Theme toggle
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            const isDark = document.body.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.querySelector('.theme-toggle').textContent = isDark ? '☀️' : '🌙';
-        }
-
-        // Load saved theme
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark');
-            document.querySelector('.theme-toggle').textContent = '☀️';
-        }
-
-        // Calendar data
-        let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
-        let currentYear = currentDate.getFullYear();
+      </div>
+      
+      <div class="card">
+        <h3>🎁 今日獎勵</h3>
+        <div id="todayRewards">
+          <div class="reward">
+            <span class="reward-icon">💰</span>
+            <div>
+              <strong>會員點數 +10</strong><br>
+              <small>每日簽到基礎獎勵</small>
+            </div>
+          </div>
+          <div class="reward">
+            <span class="reward-icon">🐾</span>
+            <div>
+              <strong>寵物經驗 +5</strong><br>
+              <small>寵物成長經驗值</small>
+            </div>
+          </div>
+          <div class="reward">
+            <span class="reward-icon">��</span>
+            <div>
+              <strong>9折優惠券 x1</strong><br>
+              <small>連續簽到第7天獎勵</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>📊 簽到歷史</h3>
+        <ul class="list">
+          <li>
+            <div>
+              <strong>2024-09-30</strong><br>
+              <small>連續第7天</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="btn success">已簽到</div>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>2024-09-29</strong><br>
+              <small>連續第6天</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="btn success">已簽到</div>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>2024-09-28</strong><br>
+              <small>連續第5天</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="btn success">已簽到</div>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>2024-09-27</strong><br>
+              <small>連續第4天</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="btn success">已簽到</div>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>2024-09-26</strong><br>
+              <small>連續第3天</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="btn success">已簽到</div>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>2024-09-25</strong><br>
+              <small>連續第2天</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="btn success">已簽到</div>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>2024-09-24</strong><br>
+              <small>連續第1天</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="btn success">已簽到</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <h3>🏆 連續簽到獎勵</h3>
+        <ul class="list">
+          <li>
+            <div>
+              <strong>連續3天</strong><br>
+              <small>額外獲得 20 點數</small>
+            </div>
+            <div class="btn success">已完成</div>
+          </li>
+          <li>
+            <div>
+              <strong>連續7天</strong><br>
+              <small>額外獲得 9折優惠券 x1</small>
+            </div>
+            <div class="btn success">已完成</div>
+          </li>
+          <li>
+            <div>
+              <strong>連續15天</strong><br>
+              <small>額外獲得 100 點數 + 免運券 x1</small>
+            </div>
+            <div class="btn warning">進行中</div>
+          </li>
+          <li>
+            <div>
+              <strong>連續30天</strong><br>
+              <small>額外獲得 500 點數 + 特殊寵物皮膚</small>
+            </div>
+            <div class="btn warning">進行中</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 簽到成功模態框 -->
+  <div id="signModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🎉 簽到成功！</h3>
+        <button class="close" onclick="closeSignModal()">&times;</button>
+      </div>
+      <div id="signRewards">
+        <!-- 獎勵內容將由JavaScript生成 -->
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 生成日曆
+    function generateCalendar() {
+      const calendar = document.getElementById('calendar');
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      
+      // 獲取當月第一天和最後一天
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      
+      // 獲取第一天是星期幾
+      const firstDayWeek = firstDay.getDay();
+      
+      // 日曆標題
+      const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+      let calendarHTML = '';
+      
+      // 添加星期標題
+      weekDays.forEach(day => {
+        calendarHTML += <div class="calendar-header"></div>;
+      });
+      
+      // 添加上個月的空白天數
+      for (let i = 0; i < firstDayWeek; i++) {
+        calendarHTML += <div class="calendar-day other-month"></div>;
+      }
+      
+      // 添加當月的天數
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayDate = new Date(year, month, day);
+        const isToday = dayDate.toDateString() === today.toDateString();
+        const isSigned = day <= today.getDate(); // 模擬已簽到的天數
         
-        // Mock signed dates (for demonstration)
-        const signedDates = [
-            '2024-12-01', '2024-12-02', '2024-12-03', '2024-12-04', '2024-12-05',
-            '2024-12-06', '2024-12-07', '2024-12-08', '2024-12-09', '2024-12-10',
-            '2024-12-11', '2024-12-12', '2024-12-13', '2024-12-14'
-        ];
-
-        // Calendar generation
-        function generateCalendar() {
-            const calendarGrid = document.getElementById('calendarGrid');
-            const calendarTitle = document.getElementById('calendarTitle');
-            
-            // Update title
-            calendarTitle.textContent = ${currentYear}年月;
-            
-            // Clear grid
-            calendarGrid.innerHTML = '';
-            
-            // Add day headers
-            const dayHeaders = ['日', '一', '二', '三', '四', '五', '六'];
-            dayHeaders.forEach(day => {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = 'calendar-day-header';
-                dayHeader.textContent = day;
-                calendarGrid.appendChild(dayHeader);
-            });
-            
-            // Get first day of month and days in month
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startDay = firstDay.getDay();
-            
-            // Add empty cells for days before month starts
-            for (let i = 0; i < startDay; i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'calendar-day other-month';
-                emptyDay.textContent = '';
-                calendarGrid.appendChild(emptyDay);
-            }
-            
-            // Add days of month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = day;
-                
-                const dateString = ${currentYear}--;
-                
-                // Check if today
-                if (day === currentDate.getDate() && currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear()) {
-                    dayElement.classList.add('today');
-                }
-                
-                // Check if signed
-                if (signedDates.includes(dateString)) {
-                    dayElement.classList.add('signed');
-                    const rewardIcon = document.createElement('div');
-                    rewardIcon.className = 'reward-icon';
-                    rewardIcon.textContent = '��';
-                    dayElement.appendChild(rewardIcon);
-                }
-                
-                calendarGrid.appendChild(dayElement);
-            }
-        }
-
-        // Change month
-        function changeMonth(direction) {
-            currentMonth += direction;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            } else if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            generateCalendar();
-        }
-
-        // Sign in function
-        function performSignIn() {
-            const signinBtn = document.getElementById('signinBtn');
-            const streakCount = document.getElementById('streakCount');
-            
-            // Check if already signed today
-            const today = new Date();
-            const todayString = ${today.getFullYear()}--;
-            
-            if (signedDates.includes(todayString)) {
-                alert('今日已簽到！');
-                return;
-            }
-            
-            // Perform sign in
-            signinBtn.disabled = true;
-            signinBtn.textContent = '簽到中...';
-            
-            setTimeout(() => {
-                // Add to signed dates
-                signedDates.push(todayString);
-                
-                // Update streak
-                const currentStreak = parseInt(streakCount.textContent);
-                streakCount.textContent = currentStreak + 1;
-                
-                // Show success message
-                alert('簽到成功！獲得 20 點數 + 10 寵物經驗！');
-                
-                // Reset button
-                signinBtn.disabled = false;
-                signinBtn.textContent = '📝 立即簽到';
-                
-                // Regenerate calendar
-                generateCalendar();
-                
-                // Add pulse animation
-                signinBtn.classList.add('pulse');
-                setTimeout(() => {
-                    signinBtn.classList.remove('pulse');
-                }, 2000);
-                
-            }, 1500);
-        }
-
-        // Show history
-        function showHistory() {
-            // Scroll to history section
-            document.querySelector('.history-container').scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-
-        // Initialize calendar
-        document.addEventListener('DOMContentLoaded', function() {
-            generateCalendar();
-            
-            // Check if already signed today
-            const today = new Date();
-            const todayString = ${today.getFullYear()}--;
-            
-            if (signedDates.includes(todayString)) {
-                const signinBtn = document.getElementById('signinBtn');
-                signinBtn.disabled = true;
-                signinBtn.textContent = '今日已簽到';
-            }
-        });
-    </script>
+        let className = 'calendar-day';
+        if (isToday) className += ' today';
+        if (isSigned) className += ' signed';
+        
+        calendarHTML += <div class="" onclick="viewDayRewards()"></div>;
+      }
+      
+      calendar.innerHTML = calendarHTML;
+    }
+    
+    function signIn() {
+      const signBtn = document.getElementById('signBtn');
+      if (signBtn.disabled) return;
+      
+      // 模擬簽到成功
+      signBtn.disabled = true;
+      signBtn.textContent = '今日已簽到';
+      
+      // 顯示獎勵模態框
+      showSignRewards();
+    }
+    
+    function showSignRewards() {
+      const rewards = [
+        { icon: '💰', title: '會員點數 +10', desc: '每日簽到基礎獎勵' },
+        { icon: '🐾', title: '寵物經驗 +5', desc: '寵物成長經驗值' },
+        { icon: '🎫', title: '9折優惠券 x1', desc: '連續簽到第7天獎勵' }
+      ];
+      
+      const rewardsHTML = rewards.map(reward => 
+        <div class="reward">
+          <span class="reward-icon"></span>
+          <div>
+            <strong></strong><br>
+            <small></small>
+          </div>
+        </div>
+      ).join('');
+      
+      document.getElementById('signRewards').innerHTML = rewardsHTML;
+      document.getElementById('signModal').classList.add('show');
+    }
+    
+    function closeSignModal() {
+      document.getElementById('signModal').classList.remove('show');
+    }
+    
+    function viewDayRewards(day) {
+      alert(查看  日的簽到獎勵詳情);
+    }
+    
+    // 檢查今日是否已簽到
+    function checkTodaySignIn() {
+      const signBtn = document.getElementById('signBtn');
+      // 這裡可以從localStorage或後端檢查
+      const todaySigned = localStorage.getItem('signed_' + new Date().toDateString());
+      if (todaySigned) {
+        signBtn.disabled = true;
+        signBtn.textContent = '今日已簽到';
+      }
+    }
+    
+    // 初始化
+    generateCalendar();
+    checkTodaySignIn();
+    
+    // 點擊模態框外部關閉
+    document.getElementById('signModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeSignModal();
+      }
+    });
+      // 此功能待開發提醒函數
+    function showComingSoon() {
+      alert("此功能待開發");
+    }
+  </script>
 </body>
 </html>
+

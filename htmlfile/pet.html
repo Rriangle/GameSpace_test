@@ -1,1018 +1,565 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寵物系統 - GameSpace</title>
-    <style>
-        :root {
-            --primary-color: #7557ff;
-            --secondary-color: #34d2ff;
-            --success-color: #22c55e;
-            --text-primary: #1f2937;
-            --text-secondary: #64748b;
-            --bg-primary: #eef3f8;
-            --bg-secondary: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.25);
-            --glass-border: rgba(255, 255, 255, 0.18);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-
-        body.dark {
-            --text-primary: #e5edff;
-            --text-secondary: #9fb1c9;
-            --bg-primary: #0c111b;
-            --bg-secondary: #0a0f18;
-            --glass-bg: rgba(0, 0, 0, 0.25);
-            --glass-border: rgba(255, 255, 255, 0.125);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            color: var(--text-primary);
-            line-height: 1.65;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                padding: 0 24px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .container {
-                padding: 0 32px;
-            }
-        }
-
-        /* Header */
-        .header {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .nav {
-            display: flex;
-            gap: 24px;
-        }
-
-        .nav a {
-            color: var(--text-primary);
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .nav a:hover {
-            background: var(--glass-bg);
-            color: var(--primary-color);
-        }
-
-        .theme-toggle {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: #6b46e5;
-            transform: translateY(-2px);
-        }
-
-        /* Main Content */
-        .main-content {
-            padding: 32px 0;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 36px;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .page-subtitle {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
-
-        /* Pet Display */
-        .pet-display {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .pet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .pet-name {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .pet-level {
-            background: var(--success-color);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .pet-canvas-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 24px;
-        }
-
-        .pet-canvas {
-            width: 200px;
-            height: 200px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
-            border: 3px solid var(--glass-border);
-            transition: all 0.3s ease;
-        }
-
-        .pet-canvas:hover {
-            transform: scale(1.05);
-            box-shadow: 0 16px 48px 0 rgba(31, 38, 135, 0.5);
-        }
-
-        .pet-experience {
-            margin-top: 16px;
-        }
-
-        .exp-label {
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .exp-bar {
-            width: 200px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        .exp-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 6px;
-            transition: width 0.3s ease;
-        }
-
-        .exp-text {
-            margin-top: 8px;
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        /* Pet Stats */
-        .pet-stats {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-        }
-
-        .stats-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .stat-item {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px 0 rgba(31, 38, 135, 0.3);
-        }
-
-        .stat-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .stat-bar {
-            margin-top: 8px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .stat-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
-        .hunger { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
-        .mood { background: linear-gradient(90deg, #4ecdc4, #6dd5ed); }
-        .stamina { background: linear-gradient(90deg, #45b7d1, #96c7ed); }
-        .cleanliness { background: linear-gradient(90deg, #96ceb4, #a8e6cf); }
-        .health { background: linear-gradient(90deg, #feca57, #ff9ff3); }
-
-        /* Pet Actions */
-        .pet-actions {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-        }
-
-        .actions-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-        }
-
-        .action-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 16px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .action-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px 0 rgba(117, 87, 255, 0.4);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Customization */
-        .customization {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-        }
-
-        .custom-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .custom-section {
-            margin-bottom: 24px;
-        }
-
-        .custom-section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-        }
-
-        .color-palette {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-            gap: 12px;
-        }
-
-        .color-option {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .color-option:hover {
-            transform: scale(1.1);
-        }
-
-        .color-option.selected {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color);
-        }
-
-        .color-option.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .color-option.locked::after {
-            content: '🔒';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 20px;
-        }
-
-        .color-cost {
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-        }
-
-        .background-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 12px;
-        }
-
-        .bg-option {
-            width: 100px;
-            height: 60px;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .bg-option:hover {
-            transform: scale(1.05);
-        }
-
-        .bg-option.selected {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color);
-        }
-
-        .bg-option.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .bg-option.locked::after {
-            content: '🔒';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 16px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 28px;
-            }
-            
-            .nav {
-                display: none;
-            }
-            
-            .pet-header {
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .pet-canvas {
-                width: 150px;
-                height: 150px;
-            }
-            
-            .exp-bar {
-                width: 150px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .pet-display,
-        .pet-stats,
-        .pet-actions,
-        .customization {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .pet-display { animation-delay: 0.1s; }
-        .pet-stats { animation-delay: 0.2s; }
-        .pet-actions { animation-delay: 0.3s; }
-        .customization { animation-delay: 0.4s; }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-        }
-
-        .pet-canvas.bounce {
-            animation: bounce 1s;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>寵物系統 - GameSpace</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --text: #212529;
+      --muted: #6c757d;
+      --line: #dee2e6;
+      --accent: #007bff;
+      --accent-hover: #0056b3;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --shadow: 0 2px 4px rgba(0,0,0,0.1);
+      --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --blur: 8px;
+      --spacing: 16px;
+      --spacing-sm: 8px;
+      --spacing-lg: 24px;
+    }
+
+    body.dark {
+      --bg: #1a1a1a;
+      --surface: #2d2d2d;
+      --text: #ffffff;
+      --muted: #adb5bd;
+      --line: #495057;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: var(--spacing); }
+    
+    .header { background: var(--surface); border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); box-shadow: var(--shadow); }
+    .header h1 { font-size: 2rem; margin-bottom: var(--spacing-sm); }
+    .header p { color: var(--muted); }
+    
+    .nav { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+    .nav a { padding: var(--spacing-sm) var(--spacing); background: var(--surface); border-radius: var(--radius); text-decoration: none; color: var(--text); box-shadow: var(--shadow); transition: all 0.2s; }
+    .nav a:hover { background: var(--accent); color: white; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg); }
+    .card { background: var(--surface); border-radius: var(--radius-lg); padding: var(--spacing-lg); box-shadow: var(--shadow); }
+    .card h3 { margin-bottom: var(--spacing); color: var(--accent); }
+    
+    .pet-display { text-align: center; margin-bottom: var(--spacing-lg); }
+    .pet-canvas { border: 3px solid var(--line); border-radius: var(--radius-lg); background: linear-gradient(135deg, #87CEEB, #98FB98); margin: 0 auto; display: block; }
+    .pet-info { margin-top: var(--spacing); }
+    .pet-name { font-size: 1.5rem; font-weight: bold; color: var(--accent); margin-bottom: var(--spacing-sm); }
+    
+    .attributes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+    .attribute { background: var(--surface); border-radius: var(--radius); padding: var(--spacing-sm); box-shadow: var(--shadow); }
+    .attribute-name { font-weight: bold; margin-bottom: var(--spacing-sm); color: var(--accent); }
+    .attribute-bar { width: 100%; height: 20px; background: var(--line); border-radius: 10px; overflow: hidden; }
+    .attribute-fill { height: 100%; transition: width 0.3s ease; }
+    .attribute-fill.hunger { background: linear-gradient(90deg, var(--danger), var(--warning)); }
+    .attribute-fill.mood { background: linear-gradient(90deg, var(--danger), var(--success)); }
+    .attribute-fill.energy { background: linear-gradient(90deg, var(--danger), var(--info)); }
+    .attribute-fill.clean { background: linear-gradient(90deg, var(--danger), var(--accent)); }
+    .attribute-fill.health { background: linear-gradient(90deg, var(--danger), var(--success)); }
+    .attribute-value { text-align: center; margin-top: var(--spacing-sm); font-weight: bold; }
+    
+    .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+    .action-btn { padding: var(--spacing-sm); background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+    .action-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+    .action-btn:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+    
+    .customization { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-sm); }
+    .customization-item { background: var(--surface); border-radius: var(--radius); padding: var(--spacing-sm); box-shadow: var(--shadow); text-align: center; }
+    .customization-item img { width: 60px; height: 60px; border-radius: var(--radius); margin-bottom: var(--spacing-sm); }
+    .customization-item h4 { margin-bottom: var(--spacing-sm); }
+    .customization-item .price { color: var(--accent); font-weight: bold; margin-bottom: var(--spacing-sm); }
+    
+    .btn { padding: var(--spacing-sm) var(--spacing); background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .btn:hover { background: var(--accent-hover); }
+    .btn.success { background: var(--success); }
+    .btn.warning { background: var(--warning); color: var(--text); }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal.show { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: var(--surface); border-radius: var(--radius-lg); padding: var(--spacing-lg); max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing); }
+    .modal-header h3 { margin: 0; }
+    .close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted); }
+    
+    .log { background: var(--surface); border-radius: var(--radius); padding: var(--spacing-sm); max-height: 200px; overflow-y: auto; border: 1px solid var(--line); }
+    .log-item { padding: var(--spacing-sm); border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+    .log-item:last-child { border-bottom: none; }
+    .log-item.success { color: var(--success); }
+    .log-item.warning { color: var(--warning); }
+    .log-item.error { color: var(--danger); }
+    
+    @media (max-width: 768px) {
+      .container { padding: var(--spacing-sm); }
+      .grid { grid-template-columns: 1fr; }
+      .attributes { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="index.html" class="logo">🎮 GameSpace</a>
-                <nav class="nav">
-                    <a href="index.html">首頁</a>
-                    <a href="wallet.html">會員錢包</a>
-                    <a href="signin.html">每日簽到</a>
-                    <a href="pet.html">寵物系統</a>
-                    <a href="minigame.html">小遊戲</a>
-                </nav>
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </div>
+  <div class="container">
+    <div class="header">
+      <h1>🐾 寵物系統</h1>
+      <p>照顧您的可愛寵物，與它一起成長！</p>
+    </div>
+    
+    <nav class="nav">
+      <a href="index.html">🏠 首頁</a>
+      <a href="wallet.html">💰 會員錢包</a>
+      <a href="signin.html">📅 簽到系統</a>
+      <a href="pet.html">🐾 寵物系統</a>
+      <a href="minigame.html">🎮 小遊戲</a>
+    </nav>
+    
+    <div class="pet-display">
+      <canvas id="petCanvas" class="pet-canvas" width="300" height="300"></canvas>
+      <div class="pet-info">
+        <div class="pet-name" id="petName">小史萊姆</div>
+        <div style="color: var(--muted);">等級 <span id="petLevel">5</span> | 經驗 <span id="petExp">120</span>/<span id="petExpMax">200</span></div>
+      </div>
+    </div>
+    
+    <div class="attributes">
+      <div class="attribute">
+        <div class="attribute-name">🍎 飢餓度</div>
+        <div class="attribute-bar">
+          <div class="attribute-fill hunger" id="hungerBar" style="width: 75%;"></div>
         </div>
-    </header>
-
-    <main class="main-content">
-        <div class="container">
-            <div class="page-header">
-                <h1 class="page-title">🐾 寵物系統</h1>
-                <p class="page-subtitle">飼養可愛的史萊姆寵物，與牠互動、餵食、玩耍，見證牠的成長</p>
-            </div>
-
-            <!-- Pet Display -->
-            <div class="pet-display">
-                <div class="pet-header">
-                    <h2 class="pet-name" id="petName">我的史萊姆</h2>
-                    <span class="pet-level" id="petLevel">Lv.3</span>
-                </div>
-                <div class="pet-canvas-container">
-                    <canvas class="pet-canvas" id="petCanvas" width="200" height="200"></canvas>
-                </div>
-                <div class="pet-experience">
-                    <div class="exp-label">經驗值</div>
-                    <div class="exp-bar">
-                        <div class="exp-fill" id="expFill" style="width: 65%"></div>
-                    </div>
-                    <div class="exp-text" id="expText">130 / 200 XP</div>
-                </div>
-            </div>
-
-            <!-- Pet Stats -->
-            <div class="pet-stats">
-                <h3 class="stats-title">寵物屬性</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-icon">🍎</div>
-                        <div class="stat-label">飢餓</div>
-                        <div class="stat-value" id="hungerValue">75%</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill hunger" id="hungerBar" style="width: 75%"></div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon">😊</div>
-                        <div class="stat-label">心情</div>
-                        <div class="stat-value" id="moodValue">60%</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill mood" id="moodBar" style="width: 60%"></div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon">⚡</div>
-                        <div class="stat-label">體力</div>
-                        <div class="stat-value" id="staminaValue">85%</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill stamina" id="staminaBar" style="width: 85%"></div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon">🧼</div>
-                        <div class="stat-label">清潔</div>
-                        <div class="stat-value" id="cleanlinessValue">70%</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill cleanliness" id="cleanlinessBar" style="width: 70%"></div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon">❤️</div>
-                        <div class="stat-label">健康</div>
-                        <div class="stat-value" id="healthValue">90%</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill health" id="healthBar" style="width: 90%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pet Actions -->
-            <div class="pet-actions">
-                <h3 class="actions-title">寵物互動</h3>
-                <div class="actions-grid">
-                    <button class="action-btn" onclick="petAction('feed')">
-                        🍎 餵食
-                    </button>
-                    <button class="action-btn" onclick="petAction('play')">
-                        🎾 玩耍
-                    </button>
-                    <button class="action-btn" onclick="petAction('bath')">
-                        🛁 洗澡
-                    </button>
-                    <button class="action-btn" onclick="petAction('sleep')">
-                        😴 哄睡
-                    </button>
-                    <button class="action-btn" onclick="petAction('train')">
-                        🏋️ 訓練
-                    </button>
-                    <button class="action-btn" onclick="petAction('heal')">
-                        💊 治療
-                    </button>
-                </div>
-            </div>
-
-            <!-- Customization -->
-            <div class="customization">
-                <h3 class="custom-title">寵物外觀</h3>
-                
-                <div class="custom-section">
-                    <div class="custom-section-title">膚色選擇</div>
-                    <div class="color-palette">
-                        <div class="color-option selected" style="background: #4ecdc4;" onclick="changeSkinColor('#4ecdc4', 0)"></div>
-                        <div class="color-option" style="background: #ff6b6b;" onclick="changeSkinColor('#ff6b6b', 2000)">
-                            <div class="color-cost">2000點</div>
-                        </div>
-                        <div class="color-option" style="background: #45b7d1;" onclick="changeSkinColor('#45b7d1', 2000)">
-                            <div class="color-cost">2000點</div>
-                        </div>
-                        <div class="color-option" style="background: #96ceb4;" onclick="changeSkinColor('#96ceb4', 2000)">
-                            <div class="color-cost">2000點</div>
-                        </div>
-                        <div class="color-option" style="background: #feca57;" onclick="changeSkinColor('#feca57', 2000)">
-                            <div class="color-cost">2000點</div>
-                        </div>
-                        <div class="color-option locked" style="background: #ff9ff3;">
-                            <div class="color-cost">5000點</div>
-                        </div>
-                        <div class="color-option locked" style="background: #a8e6cf;">
-                            <div class="color-cost">5000點</div>
-                        </div>
-                        <div class="color-option locked" style="background: #ff8e8e;">
-                            <div class="color-cost">5000點</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="custom-section">
-                    <div class="custom-section-title">背景主題</div>
-                    <div class="background-options">
-                        <div class="bg-option selected" style="background: linear-gradient(135deg, #ff6b6b, #4ecdc4);" onclick="changeBackground('gradient1', 0)">
-                            彩虹
-                        </div>
-                        <div class="bg-option" style="background: linear-gradient(135deg, #45b7d1, #96c7ed);" onclick="changeBackground('gradient2', 0)">
-                            海洋
-                        </div>
-                        <div class="bg-option" style="background: linear-gradient(135deg, #96ceb4, #a8e6cf);" onclick="changeBackground('gradient3', 0)">
-                            森林
-                        </div>
-                        <div class="bg-option" style="background: linear-gradient(135deg, #feca57, #ff9ff3);" onclick="changeBackground('gradient4', 0)">
-                            夕陽
-                        </div>
-                        <div class="bg-option locked" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="changeBackground('gradient5', 1000)">
-                            星空
-                            <div class="color-cost">1000點</div>
-                        </div>
-                        <div class="bg-option locked" style="background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="changeBackground('gradient6', 1000)">
-                            櫻花
-                            <div class="color-cost">1000點</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="attribute-value" id="hungerValue">75</div>
+      </div>
+      <div class="attribute">
+        <div class="attribute-name">😊 心情</div>
+        <div class="attribute-bar">
+          <div class="attribute-fill mood" id="moodBar" style="width: 85%;"></div>
         </div>
-    </main>
-
-    <script>
-        // Theme toggle
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            const isDark = document.body.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.querySelector('.theme-toggle').textContent = isDark ? '☀️' : '🌙';
-        }
-
-        // Load saved theme
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark');
-            document.querySelector('.theme-toggle').textContent = '☀️';
-        }
-
-        // Pet data
-        let petData = {
-            name: '我的史萊姆',
-            level: 3,
-            experience: 130,
-            maxExperience: 200,
-            hunger: 75,
-            mood: 60,
-            stamina: 85,
-            cleanliness: 70,
-            health: 90,
-            skinColor: '#4ecdc4',
-            background: 'gradient1'
-        };
-
-        // Pet drawing
-        function drawPet() {
-            const canvas = document.getElementById('petCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw background
-            const backgrounds = {
-                'gradient1': ['#ff6b6b', '#4ecdc4'],
-                'gradient2': ['#45b7d1', '#96c7ed'],
-                'gradient3': ['#96ceb4', '#a8e6cf'],
-                'gradient4': ['#feca57', '#ff9ff3'],
-                'gradient5': ['#667eea', '#764ba2'],
-                'gradient6': ['#f093fb', '#f5576c']
-            };
-            
-            const bgColors = backgrounds[petData.background] || backgrounds['gradient1'];
-            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, bgColors[0]);
-            gradient.addColorStop(1, bgColors[1]);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw pet body (slime)
-            ctx.fillStyle = petData.skinColor;
-            ctx.beginPath();
-            ctx.arc(100, 140, 60, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Add shine effect
-            const shineGradient = ctx.createRadialGradient(80, 120, 0, 80, 120, 30);
-            shineGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-            shineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            ctx.fillStyle = shineGradient;
-            ctx.beginPath();
-            ctx.arc(80, 120, 30, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Draw eyes
-            ctx.fillStyle = '#2c3e50';
-            ctx.beginPath();
-            ctx.arc(85, 125, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(115, 125, 6, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Draw eye highlights
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(87, 123, 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(117, 123, 2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Draw mouth based on mood
-            ctx.strokeStyle = '#2c3e50';
-            ctx.lineWidth = 3;
-            if (petData.mood > 70) {
-                // Happy smile
-                ctx.beginPath();
-                ctx.arc(100, 145, 15, 0, Math.PI);
-                ctx.stroke();
-            } else if (petData.mood > 40) {
-                // Neutral mouth
-                ctx.beginPath();
-                ctx.moveTo(90, 145);
-                ctx.lineTo(110, 145);
-                ctx.stroke();
-            } else {
-                // Sad mouth
-                ctx.beginPath();
-                ctx.arc(100, 155, 15, Math.PI, 0);
-                ctx.stroke();
-            }
-            
-            // Add sparkle effects
-            ctx.fillStyle = '#ffd700';
-            for (let i = 0; i < 5; i++) {
-                const x = 20 + Math.random() * 160;
-                const y = 20 + Math.random() * 160;
-                ctx.beginPath();
-                ctx.arc(x, y, 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        // Update pet stats display
-        function updateStatsDisplay() {
-            document.getElementById('hungerValue').textContent = petData.hunger + '%';
-            document.getElementById('hungerBar').style.width = petData.hunger + '%';
-            document.getElementById('moodValue').textContent = petData.mood + '%';
-            document.getElementById('moodBar').style.width = petData.mood + '%';
-            document.getElementById('staminaValue').textContent = petData.stamina + '%';
-            document.getElementById('staminaBar').style.width = petData.stamina + '%';
-            document.getElementById('cleanlinessValue').textContent = petData.cleanliness + '%';
-            document.getElementById('cleanlinessBar').style.width = petData.cleanliness + '%';
-            document.getElementById('healthValue').textContent = petData.health + '%';
-            document.getElementById('healthBar').style.width = petData.health + '%';
-            
-            document.getElementById('expText').textContent = ${petData.experience} /  XP;
-            document.getElementById('expFill').style.width = (petData.experience / petData.maxExperience * 100) + '%';
-        }
-
-        // Pet actions
-        function petAction(action) {
-            const actions = {
-                'feed': { hunger: 20, mood: 10, stamina: -5, cleanliness: -5 },
-                'play': { hunger: -10, mood: 15, stamina: -15, health: 5 },
-                'bath': { cleanliness: 25, mood: 5, stamina: -5 },
-                'sleep': { stamina: 20, health: 10, mood: 5, hunger: -5 },
-                'train': { stamina: -10, mood: 5, health: 5, experience: 5 },
-                'heal': { health: 20, stamina: 10, mood: 10 }
-            };
-            
-            const effect = actions[action];
-            if (!effect) return;
-            
-            // Update stats
-            Object.keys(effect).forEach(stat => {
-                if (stat === 'experience') {
-                    petData[stat] = Math.min(petData.maxExperience, petData[stat] + effect[stat]);
-                    // Check for level up
-                    if (petData.experience >= petData.maxExperience) {
-                        levelUp();
-                    }
-                } else {
-                    petData[stat] = Math.max(0, Math.min(100, petData[stat] + effect[stat]));
-                }
-            });
-            
-            // Update display
-            updateStatsDisplay();
-            drawPet();
-            
-            // Show feedback
-            const messages = {
-                'feed': '史萊姆吃得很開心！',
-                'play': '史萊姆玩得很興奮！',
-                'bath': '史萊姆變得乾淨閃亮！',
-                'sleep': '史萊姆睡得很香甜！',
-                'train': '史萊姆變得更強壯了！',
-                'heal': '史萊姆恢復了健康！'
-            };
-            
-            alert(messages[action]);
-            
-            // Add bounce animation
-            const canvas = document.getElementById('petCanvas');
-            canvas.classList.add('bounce');
-            setTimeout(() => {
-                canvas.classList.remove('bounce');
-            }, 1000);
-        }
-
-        // Level up function
-        function levelUp() {
-            petData.level++;
-            petData.experience = 0;
-            petData.maxExperience = Math.floor(petData.maxExperience * 1.5);
-            
-            // Increase all stats slightly
-            petData.hunger = Math.min(100, petData.hunger + 10);
-            petData.mood = Math.min(100, petData.mood + 10);
-            petData.stamina = Math.min(100, petData.stamina + 10);
-            petData.cleanliness = Math.min(100, petData.cleanliness + 10);
-            petData.health = Math.min(100, petData.health + 10);
-            
-            document.getElementById('petLevel').textContent = Lv.;
-            alert(恭喜！史萊姆升到 Lv.！所有屬性都提升了！);
-            
-            updateStatsDisplay();
-        }
-
-        // Change skin color
-        function changeSkinColor(color, cost) {
-            if (cost > 0) {
-                if (confirm(確定要花費  點數更換膚色嗎？)) {
-                    petData.skinColor = color;
-                    drawPet();
-                    
-                    // Update selected color
-                    document.querySelectorAll('.color-option').forEach(option => {
-                        option.classList.remove('selected');
-                    });
-                    event.target.classList.add('selected');
-                    
-                    alert('膚色更換成功！');
-                }
-            } else {
-                petData.skinColor = color;
-                drawPet();
-                
-                // Update selected color
-                document.querySelectorAll('.color-option').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                event.target.classList.add('selected');
-            }
-        }
-
-        // Change background
-        function changeBackground(bg, cost) {
-            if (cost > 0) {
-                if (confirm(確定要花費  點數更換背景嗎？)) {
-                    petData.background = bg;
-                    drawPet();
-                    
-                    // Update selected background
-                    document.querySelectorAll('.bg-option').forEach(option => {
-                        option.classList.remove('selected');
-                    });
-                    event.target.classList.add('selected');
-                    
-                    alert('背景更換成功！');
-                }
-            } else {
-                petData.background = bg;
-                drawPet();
-                
-                // Update selected background
-                document.querySelectorAll('.bg-option').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                event.target.classList.add('selected');
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            drawPet();
-            updateStatsDisplay();
-            
-            // Add periodic animations
-            setInterval(() => {
-                const canvas = document.getElementById('petCanvas');
-                canvas.style.transform = 'translateY(-2px)';
-                setTimeout(() => {
-                    canvas.style.transform = 'translateY(0px)';
-                }, 1000);
-            }, 3000);
-            
-            // Simulate stat changes over time
-            setInterval(() => {
-                // Gradually decrease stats
-                petData.hunger = Math.max(0, petData.hunger - 1);
-                petData.mood = Math.max(0, petData.mood - 0.5);
-                petData.stamina = Math.max(0, petData.stamina - 0.5);
-                petData.cleanliness = Math.max(0, petData.cleanliness - 0.5);
-                
-                updateStatsDisplay();
-            }, 30000); // Every 30 seconds
-        });
-    </script>
+        <div class="attribute-value" id="moodValue">85</div>
+      </div>
+      <div class="attribute">
+        <div class="attribute-name">⚡ 活力</div>
+        <div class="attribute-bar">
+          <div class="attribute-fill energy" id="energyBar" style="width: 60%;"></div>
+        </div>
+        <div class="attribute-value" id="energyValue">60</div>
+      </div>
+      <div class="attribute">
+        <div class="attribute-name">🧼 清潔度</div>
+        <div class="attribute-bar">
+          <div class="attribute-fill clean" id="cleanBar" style="width: 90%;"></div>
+        </div>
+        <div class="attribute-value" id="cleanValue">90</div>
+      </div>
+      <div class="attribute">
+        <div class="attribute-name">❤️ 健康度</div>
+        <div class="attribute-bar">
+          <div class="attribute-fill health" id="healthBar" style="width: 95%;"></div>
+        </div>
+        <div class="attribute-value" id="healthValue">95</div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button class="action-btn" onclick="feedPet()">🍎 餵食</button>
+      <button class="action-btn" onclick="playWithPet()">🎾 玩耍</button>
+      <button class="action-btn" onclick="bathePet()">🛁 洗澡</button>
+      <button class="action-btn" onclick="sleepPet()">😴 哄睡</button>
+      <button class="action-btn" onclick="renamePet()">✏️ 改名</button>
+      <button class="action-btn" onclick="changeSkin()">🎨 換膚</button>
+    </div>
+    
+    <div class="grid">
+      <div class="card">
+        <h3>🎨 寵物皮膚</h3>
+        <div class="customization">
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: #f6d84a; border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>經典黃</h4>
+            <div class="price">免費</div>
+            <button class="btn" onclick="selectSkin('classic')">選擇</button>
+          </div>
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: #ff6b6b; border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>熱情紅</h4>
+            <div class="price">100點</div>
+            <button class="btn" onclick="selectSkin('red')">選擇</button>
+          </div>
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: #4ecdc4; border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>清新藍</h4>
+            <div class="price">150點</div>
+            <button class="btn" onclick="selectSkin('blue')">選擇</button>
+          </div>
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: #45b7d1; border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>夢幻紫</h4>
+            <div class="price">200點</div>
+            <button class="btn" onclick="selectSkin('purple')">選擇</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>🖼️ 背景主題</h3>
+        <div class="customization">
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #87CEEB, #98FB98); border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>草原</h4>
+            <div class="price">免費</div>
+            <button class="btn" onclick="selectBackground('grassland')">選擇</button>
+          </div>
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ff9a9e, #fecfef); border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>櫻花</h4>
+            <div class="price">150點</div>
+            <button class="btn" onclick="selectBackground('sakura')">選擇</button>
+          </div>
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>星空</h4>
+            <div class="price">200點</div>
+            <button class="btn" onclick="selectBackground('starry')">選擇</button>
+          </div>
+          <div class="customization-item">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: var(--radius); margin: 0 auto var(--spacing-sm);"></div>
+            <h4>彩虹</h4>
+            <div class="price">300點</div>
+            <button class="btn" onclick="selectBackground('rainbow')">選擇</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>📝 互動日誌</h3>
+        <div class="log" id="petLog">
+          <div class="log-item success">🍎 餵食成功！飢餓度 +10</div>
+          <div class="log-item success">🎾 玩耍成功！心情 +15</div>
+          <div class="log-item success">🛁 洗澡成功！清潔度 +20</div>
+          <div class="log-item success">😴 哄睡成功！活力 +25</div>
+          <div class="log-item">📅 每日自動恢復：健康度 +5</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 改名模態框 -->
+  <div id="renameModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>✏️ 修改寵物名字</h3>
+        <button class="close" onclick="closeRenameModal()">&times;</button>
+      </div>
+      <div style="margin-bottom: var(--spacing);">
+        <input type="text" id="newPetName" placeholder="輸入新的寵物名字" style="width: 100%; padding: var(--spacing-sm); border-radius: var(--radius); border: 1px solid var(--line);">
+      </div>
+      <div style="text-align: right;">
+        <button class="btn" onclick="confirmRename()">確認修改</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 寵物數據
+    let pet = {
+      name: '小史萊姆',
+      level: 5,
+      exp: 120,
+      expMax: 200,
+      hunger: 75,
+      mood: 85,
+      energy: 60,
+      clean: 90,
+      health: 95,
+      skin: 'classic',
+      background: 'grassland'
+    };
+    
+    // Canvas 繪製
+    const canvas = document.getElementById('petCanvas');
+    const ctx = canvas.getContext('2d');
+    let animationFrame = 0;
+    
+    function drawPet() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 繪製背景
+      const backgrounds = {
+        'grassland': ['#87CEEB', '#98FB98'],
+        'sakura': ['#ff9a9e', '#fecfef'],
+        'starry': ['#667eea', '#764ba2'],
+        'rainbow': ['#f093fb', '#f5576c']
+      };
+      
+      const bgColors = backgrounds[pet.background] || backgrounds['grassland'];
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, bgColors[0]);
+      gradient.addColorStop(1, bgColors[1]);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // 繪製地面
+      ctx.fillStyle = '#90EE90';
+      ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+      
+      // 繪製史萊姆
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2 + 20;
+      const size = 80;
+      
+      // 史萊姆顏色
+      const skinColors = {
+        'classic': '#f6d84a',
+        'red': '#ff6b6b',
+        'blue': '#4ecdc4',
+        'purple': '#45b7d1'
+      };
+      
+      ctx.fillStyle = skinColors[pet.skin] || skinColors['classic'];
+      
+      // 史萊姆身體（帶動畫）
+      const bounce = Math.sin(animationFrame * 0.1) * 3;
+      ctx.beginPath();
+      ctx.ellipse(centerX, centerY + bounce, size, size * 0.8, 0, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // 史萊姆高光
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.beginPath();
+      ctx.ellipse(centerX - 20, centerY - 20 + bounce, 20, 15, 0, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // 眼睛
+      const eyeBlink = Math.sin(animationFrame * 0.05) > 0.8 ? 0 : 8;
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.ellipse(centerX - 15, centerY - 10 + bounce, 6, eyeBlink, 0, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(centerX + 15, centerY - 10 + bounce, 6, eyeBlink, 0, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // 嘴巴（根據心情變化）
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      if (pet.mood > 70) {
+        // 開心
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + 10 + bounce, 15, 0, Math.PI);
+        ctx.stroke();
+      } else if (pet.mood > 40) {
+        // 普通
+        ctx.beginPath();
+        ctx.moveTo(centerX - 10, centerY + 10 + bounce);
+        ctx.lineTo(centerX + 10, centerY + 10 + bounce);
+        ctx.stroke();
+      } else {
+        // 不開心
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + 20 + bounce, 15, Math.PI, 2 * Math.PI);
+        ctx.stroke();
+      }
+      
+      // 狀態效果
+      if (pet.clean < 50) {
+        // 髒污效果
+        ctx.fillStyle = 'rgba(139, 69, 19, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(centerX - 10, centerY + 5 + bounce, 8, 5, 0, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(centerX + 15, centerY - 5 + bounce, 6, 4, 0, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+      
+      if (pet.energy < 30) {
+        // 疲憊效果（Z字）
+        ctx.fillStyle = '#fff';
+        ctx.font = '16px Arial';
+        ctx.fillText('Z', centerX + 30, centerY - 30 + bounce);
+        ctx.fillText('z', centerX + 35, centerY - 15 + bounce);
+      }
+      
+      animationFrame++;
+    }
+    
+    // 更新屬性條
+    function updateAttributes() {
+      document.getElementById('hungerValue').textContent = pet.hunger;
+      document.getElementById('hungerBar').style.width = pet.hunger + '%';
+      
+      document.getElementById('moodValue').textContent = pet.mood;
+      document.getElementById('moodBar').style.width = pet.mood + '%';
+      
+      document.getElementById('energyValue').textContent = pet.energy;
+      document.getElementById('energyBar').style.width = pet.energy + '%';
+      
+      document.getElementById('cleanValue').textContent = pet.clean;
+      document.getElementById('cleanBar').style.width = pet.clean + '%';
+      
+      document.getElementById('healthValue').textContent = pet.health;
+      document.getElementById('healthBar').style.width = pet.health + '%';
+      
+      document.getElementById('petName').textContent = pet.name;
+      document.getElementById('petLevel').textContent = pet.level;
+      document.getElementById('petExp').textContent = pet.exp;
+      document.getElementById('petExpMax').textContent = pet.expMax;
+    }
+    
+    // 寵物互動功能
+    function feedPet() {
+      if (pet.hunger >= 100) {
+        addLog('🍎 寵物已經很飽了！', 'warning');
+        return;
+      }
+      
+      pet.hunger = Math.min(100, pet.hunger + 15);
+      pet.mood = Math.min(100, pet.mood + 5);
+      addLog('🍎 餵食成功！飢餓度 +15，心情 +5', 'success');
+      updateAttributes();
+    }
+    
+    function playWithPet() {
+      if (pet.energy < 20) {
+        addLog('🎾 寵物太累了，需要休息！', 'warning');
+        return;
+      }
+      
+      pet.mood = Math.min(100, pet.mood + 20);
+      pet.energy = Math.max(0, pet.energy - 15);
+      pet.hunger = Math.max(0, pet.hunger - 5);
+      addLog('🎾 玩耍成功！心情 +20，活力 -15，飢餓度 -5', 'success');
+      updateAttributes();
+    }
+    
+    function bathePet() {
+      pet.clean = Math.min(100, pet.clean + 25);
+      pet.mood = Math.min(100, pet.mood + 10);
+      addLog('🛁 洗澡成功！清潔度 +25，心情 +10', 'success');
+      updateAttributes();
+    }
+    
+    function sleepPet() {
+      if (pet.energy >= 90) {
+        addLog('😴 寵物還不累！', 'warning');
+        return;
+      }
+      
+      pet.energy = Math.min(100, pet.energy + 30);
+      pet.health = Math.min(100, pet.health + 5);
+      addLog('😴 哄睡成功！活力 +30，健康度 +5', 'success');
+      updateAttributes();
+    }
+    
+    function renamePet() {
+      document.getElementById('newPetName').value = pet.name;
+      document.getElementById('renameModal').classList.add('show');
+    }
+    
+    function confirmRename() {
+      const newName = document.getElementById('newPetName').value.trim();
+      if (newName && newName.length <= 10) {
+        pet.name = newName;
+        addLog('✏️ 寵物名字已修改為：' + newName, 'success');
+        updateAttributes();
+        closeRenameModal();
+      } else {
+        alert('名字不能為空且不能超過10個字！');
+      }
+    }
+    
+    function closeRenameModal() {
+      document.getElementById('renameModal').classList.remove('show');
+    }
+    
+    function selectSkin(skin) {
+      const costs = {
+        'classic': 0,
+        'red': 100,
+        'blue': 150,
+        'purple': 200
+      };
+      
+      const cost = costs[skin];
+      if (cost === 0 || confirm("確定要花費 " + cost + " 點數購買此皮膚嗎？")) {
+        pet.skin = skin;
+        addLog('🎨 已更換皮膚為：' + skin, 'success');
+      }
+    }
+    
+    function selectBackground(background) {
+      const costs = {
+        'grassland': 0,
+        'sakura': 150,
+        'starry': 200,
+        'rainbow': 300
+      };
+      
+      const cost = costs[background];
+      if (cost === 0 || confirm("確定要花費 " + cost + " 點數購買此背景嗎？")) {
+        pet.background = background;
+        addLog('🖼️ 已更換背景為：' + background, 'success');
+      }
+    }
+    
+    function addLog(message, type = '') {
+      const log = document.getElementById('petLog');
+      const logItem = document.createElement('div');
+      logItem.className = 'log-item' + (type ? ' ' + type : '');
+      logItem.textContent = message;
+      log.insertBefore(logItem, log.firstChild);
+      
+      // 限制日誌數量
+      while (log.children.length > 10) {
+        log.removeChild(log.lastChild);
+      }
+    }
+    
+    // 自動屬性下降
+    function autoDecay() {
+      pet.hunger = Math.max(0, pet.hunger - 1);
+      pet.mood = Math.max(0, pet.mood - 0.5);
+      pet.energy = Math.max(0, pet.energy - 0.8);
+      pet.clean = Math.max(0, pet.clean - 0.3);
+      
+      // 健康度根據其他屬性計算
+      const avgHealth = (pet.hunger + pet.mood + pet.energy + pet.clean) / 4;
+      pet.health = Math.max(0, Math.min(100, avgHealth));
+      
+      updateAttributes();
+    }
+    
+    // 初始化
+    updateAttributes();
+    drawPet();
+    
+    // 動畫循環
+    setInterval(() => {
+      drawPet();
+    }, 100);
+    
+    // 每30秒自動下降屬性
+    setInterval(autoDecay, 30000);
+    
+    // 點擊模態框外部關閉
+    document.getElementById('renameModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeRenameModal();
+      }
+    });
+      // 此功能待開發提醒函數
+    function showComingSoon() {
+      alert("此功能待開發");
+    }
+  </script>
 </body>
 </html>
+
